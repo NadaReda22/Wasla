@@ -1,11 +1,16 @@
 @php
+    $brandName = $settings?->brand_name ?? 'Wasla';
+    $slogan = $settings?->brand_slogan ?? 'Connected Journeys';
+    $logo = $settings?->brand_logo ? \Illuminate\Support\Facades\Storage::url($settings->brand_logo) : asset('images/logo.png');
+
     $navLinks = [
         ['to' => url('/'), 'label' => 'Home'],
         ['to' => url('/#tours'), 'label' => "Today's Tours"],
-        ['to' => url('/about'), 'label' => 'About Us'],
+        ['to' => url('/#about'), 'label' => 'About Us'],
+        ['to' => url('/#policies'), 'label' => 'Policies'],
         ['to' => url('/instructions'), 'label' => 'Instructions'],
         ['to' => url('/faq'), 'label' => 'FAQ'],
-        ['to' => url('/dashboard'), 'label' => 'Dashboard'],
+        ['to' => url('/#coverage'), 'label' => 'Coverage Area'],     
     ];
 @endphp
 
@@ -16,19 +21,17 @@
         <a href="{{ url('/') }}" class="flex items-center group">
             
             <!-- Logo Container -->
-            <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                <!-- Scale 2.2 blows up the image to hide the transparent borders. Origin-center keeps it balanced. -->
-                <img src="{{ asset('images/logo.png') }}" alt="Wasla logo" class="w-full h-full object-contain scale-[2.7] group-hover:scale-[2.3] transition-transform origin-center">
+            <div class="w-20 h-20 flex items-center justify-center shrink-0 overflow-visible">
+                <img src="{{ $logo }}" alt="{{ $brandName }} logo" class="max-w-none w-50 h-32 group-hover:scale-[1.3] object-contain">
             </div>
 
             <!-- Text Container -->
-            <!-- -ml-4 pulls the text left to eat up the transparent gap. items-start forces perfect left-alignment. -->
             <div class="flex flex-col justify-center items-start text-left ml-4 z-8">
                 <span id="nav-brand-title" class="font-display font-bold text-3xl leading-none text-gold tracking-widest">
-                    Wasla
+                    {{ $brandName }}
                 </span>
                 <span id="nav-brand-subtitle" class="text-xs font-semibold text-gold/80 tracking-wide mt-1 ml-[-4px]">
-                    Connected Journeys
+                    {{ $slogan }}
                 </span>
             </div>
         </a>
@@ -40,12 +43,16 @@
                     {{ $link['label'] }}
                 </a>
             @endforeach
-            <a href="{{ url('/booking') }}" class="btn-gold ml-2 text-sm">
-                Book Now
-                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-            </a>
+            
+            <!-- Hide on /book route -->
+            @if(!request()->is('book'))
+                <a href="{{ url('/book') }}" class="btn-gold ml-2 text-sm">
+                    Book Now
+                    <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+            @endif
         </div>
 
         <!-- MOBILE MENU BUTTON -->
@@ -67,9 +74,13 @@
                     {{ $link['label'] }}
                 </a>
             @endforeach
-            <a href="{{ url('/booking') }}" class="btn-gold w-full mt-2 inline-block text-center">
-                Book Now
-            </a>
+            
+            <!-- Hide on /book route -->
+            @if(!request()->is('book'))
+                <a href="{{ url('/book') }}" class="btn-gold w-full mt-2 inline-block text-center">
+                    Book Now
+                </a>
+            @endif
         </div>
     </div>
 </header>
@@ -95,7 +106,7 @@
                 header.classList.remove('bg-transparent', 'py-4');
                 header.classList.add('bg-white', 'shadow-lg', 'py-2');
                 
-                // 2. Brand Text (Wasla -> Gold, Subtitle -> Primary Blue)
+                // 2. Brand Text (Wasla -> Primary, Subtitle -> Primary)
                 title.classList.remove('text-gold');
                 title.classList.add('text-primary');
                 
@@ -103,13 +114,13 @@
                 subtitle.classList.add('text-primary');
                 
                 // 3. Mobile Button
-                mobileBtn.classList.remove('text-gold');
-                mobileBtn.classList.add('text-navy');
+                mobileBtn.classList.remove('text-white');
+                mobileBtn.classList.add('text-primary');
                 
-                // 4. Desktop Nav Links
+                // 4. Desktop Nav Links (Change to Primary Blue)
                 desktopLinks.forEach(link => {
-                    link.classList.remove('text-gold', 'hover:bg-white/10');
-                    link.classList.add('text-navy', 'hover:bg-primary/10', 'hover:text-primary');
+                    link.classList.remove('text-white', 'hover:bg-white/10');
+                    link.classList.add('text-primary', 'hover:bg-primary/10');
                 });
                 
             } else if (window.scrollY <= 20 && isScrolled) {
@@ -119,7 +130,7 @@
                 header.classList.remove('bg-white', 'shadow-lg', 'py-2');
                 header.classList.add('bg-transparent', 'py-4');
                 
-                // 2. Revert Brand Text (Wasla -> White, Subtitle -> White/80)
+                // 2. Revert Brand Text (Wasla -> Gold, Subtitle -> Gold/80)
                 title.classList.remove('text-primary');
                 title.classList.add('text-gold');
                 
@@ -127,13 +138,13 @@
                 subtitle.classList.add('text-gold/80');
                 
                 // 3. Revert Mobile Button
-                mobileBtn.classList.remove('text-navy');
-                mobileBtn.classList.add('text-gold');
+                mobileBtn.classList.remove('text-primary');
+                mobileBtn.classList.add('text-white');
                 
-                // 4. Revert Desktop Nav Links
+                // 4. Revert Desktop Nav Links (Back to White)
                 desktopLinks.forEach(link => {
-                    link.classList.remove('text-navy', 'hover:bg-primary/10', 'hover:text-primary');
-                    link.classList.add('text-gold', 'hover:bg-gold/10');
+                    link.classList.remove('text-primary', 'hover:bg-primary/10');
+                    link.classList.add('text-white', 'hover:bg-white/10');
                 });
             }
         });

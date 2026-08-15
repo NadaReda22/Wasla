@@ -4,14 +4,20 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "build:filament": "npx tailwindcss@3 --input ./resources/css/filament/admin/theme.css --output ./public/css/filament/admin/theme.css --config ./resources/css/filament/admin/tailwind.config.js --minify",
+        "dev:filament": "npx tailwindcss@3 --input ./resources/css/filament/admin/theme.css --output ./public/css/filament/admin/theme.css --config ./resources/css/filament/admin/tailwind.config.js --watch"
     },
     "devDependencies": {
+        "@tailwindcss/forms": "^0.5.11",
+        "@tailwindcss/typography": "^0.5.20",
         "@tailwindcss/vite": "^4.0.0",
+        "autoprefixer": "^10.5.4",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
-        "tailwindcss": "^4.0.0",
+        "postcss": "^8.5.19",
+        "tailwindcss": "^4.3.3",
         "vite": "^7.0.7"
     },
     "dependencies": {

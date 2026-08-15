@@ -9,22 +9,22 @@
     $sharmImages = [
         [
             'id' => 'sharm-1',
-            'src' => 'https://images.unsplash.com/photo-1587381958131-f29570993273',
+            'src' => 'images/sharm-showcase/sharm1.png',
             'alt' => 'Naama Bay Sharm El Sheikh crystal clear turquoise water and white sandy beach with palm trees',
         ],
         [
             'id' => 'sharm-2',
-            'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_104cf173d-1772194396285.png',
+            'src' => 'images/sharm-showcase/sharm2.png',
             'alt' => 'Sharm El Sheikh Red Sea coastline with colorful coral reef visible through clear water',
         ],
         [
             'id' => 'sharm-3',
-            'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_1a9d914aa-1783615095971.png',
+            'src' => 'images/sharm-showcase/sharm3.png',
             'alt' => 'Dahab Blue Hole diving site with turquoise water and desert mountains in background',
         ],
         [
             'id' => 'sharm-4',
-            'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_109b60524-1772191573617.png',
+            'src' => 'images/sharm-showcase/sharm4.png',
             'alt' => 'Ras Mohamed National Park underwater coral garden with tropical fish in Red Sea Egypt',
         ],
     ];
@@ -105,7 +105,7 @@
 
         <div class="text-center">
             <a href="{{ route('booking.create') }}" class="btn-coral px-10 py-4 text-base rounded-2xl inline-flex">
-                Book Your First Ride — $4 Total, $1 Deposit
+                Book Your First Ride — $4 Total, $2 Deposit
             </a>
             <p class="text-navy/50 text-sm mt-3">No hidden fees. Cancel free up to 12 hours before.</p>
         </div>

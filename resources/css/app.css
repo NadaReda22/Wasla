@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* 1. Define your custom theme variables for Tailwind v4 */
+/* 1. Custom Theme Variables & Animations (Tailwind v4) */
 @theme {
   --color-primary: #1877C9;
   --color-primary-50: #E8F4FC;
@@ -37,20 +37,21 @@
   --font-sans: "Poppins", system-ui, sans-serif;
   --font-display: "Poppins", system-ui, sans-serif;
 
-  --animate-fade-in: fadeIn 0.6s ease-out;
-  --animate-slide-up: slideUp 0.5s ease-out;
-  --animate-slide-down: slideDown 0.4s ease-out;
+  /* UI Animations unified into Tailwind's engine */
+  --animate-fade-in: fadeIn 300ms ease forwards;
+  --animate-slide-up: slideUp 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-slide-down: slideDown 400ms ease-out;
   --animate-float: float 3s ease-in-out infinite;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-shimmer: shimmer 2s linear infinite;
-  --animate-scale-in: scaleIn 0.3s ease-out;
+  --animate-scale-in: scaleIn 300ms ease-out;
 
   @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
   @keyframes slideUp {
-    0% { transform: translateY(30px); opacity: 0; }
+    0% { transform: translateY(24px); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
   }
   @keyframes slideDown {
@@ -84,9 +85,7 @@
   }
 }
 
-/* 3. Base building-block classes — MUST be @utility (not @layer components)
-   because other classes below chain into them via @apply.
-   This is the actual fix for "Cannot apply unknown utility class `btn`". */
+/* 3. Base Utilities for Component Chaining */
 @utility btn {
   @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 focus:outline-none focus:ring-4;
 }
@@ -100,69 +99,60 @@
   .btn-primary {
     @apply btn bg-primary text-white hover:bg-primary-600 focus:ring-primary/30 shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-0.5;
   }
-
   .btn-gold {
     @apply btn bg-gold text-navy hover:bg-gold-light focus:ring-gold/30 shadow-lg shadow-gold/30 hover:shadow-xl hover:-translate-y-0.5;
   }
-
   .btn-coral {
     @apply btn bg-coral text-white hover:bg-coral-dark focus:ring-coral/30 shadow-lg shadow-coral/30 hover:shadow-xl hover:-translate-y-0.5;
   }
-
   .btn-turquoise {
     @apply btn bg-turquoise text-white hover:bg-turquoise-dark focus:ring-turquoise/30 shadow-lg shadow-turquoise/30 hover:shadow-xl hover:-translate-y-0.5;
   }
-
   .btn-outline {
     @apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary/30;
   }
-
   .btn-ghost {
     @apply btn text-navy hover:bg-sand-light;
   }
-
   .card {
     @apply bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100;
   }
-
   .input {
     @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all duration-200 bg-white;
   }
-
   .label {
     @apply block text-sm font-semibold text-navy mb-2;
   }
-
   .badge-gold {
     @apply badge bg-gold/20 text-gold-dark;
   }
-
   .badge-turquoise {
     @apply badge bg-turquoise/15 text-turquoise-dark;
   }
-
   .badge-coral {
     @apply badge bg-coral/15 text-coral-dark;
   }
-
   .badge-primary {
     @apply badge bg-primary/15 text-primary;
   }
-
   .section-padding {
     @apply px-4 sm:px-6 lg:px-8 py-16 lg:py-24;
   }
-
   .container-max {
     @apply max-w-7xl mx-auto;
   }
 }
 
-/* 5. Custom Utilities */
+/* 5. Custom UI Utilities (Consolidated) */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Gradients */
   .gradient-navy {
     background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-light) 100%);
   }
@@ -172,38 +162,21 @@
   .gradient-gold {
     background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-light) 100%);
   }
+  .hero-gradient {
+    background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-primary) 60%, var(--color-turquoise) 100%);
+  }
+
+  /* Effects & Overlays */
   .glass {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .shadow-card { 
+    box-shadow: 0 2px 12px rgba(10, 37, 64, 0.08); 
   }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .line-clamp-1 {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
-@layer utilities {
-  .font-tabular {
-    font-variant-numeric: tabular-nums;
-  }
-  .hero-gradient {
-    background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-primary) 60%, var(--color-turquoise) 100%);
+  .shadow-card-hover { 
+    box-shadow: 0 8px 28px rgba(10, 37, 64, 0.14); 
   }
   .card-hover {
     transition: transform 200ms ease, box-shadow 200ms ease;
@@ -212,11 +185,32 @@
     transform: translateY(-4px);
     box-shadow: 0 12px 32px rgba(24, 119, 201, 0.18);
   }
-  .sidebar-item-active {
-    background-color: rgba(24, 119, 201, 0.12);
-    color: var(--color-primary);
-    border-radius: 10px;
+  .focus-ring:focus { 
+    outline: none; box-shadow: 0 0 0 3px rgba(24, 119, 201, 0.25); 
   }
+
+  /* Layout Utilities */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Sidebar Items */
   .sidebar-item {
     color: #6B7280;
     border-radius: 10px;
@@ -226,10 +220,18 @@
     background-color: rgba(24, 119, 201, 0.07);
     color: var(--color-primary);
   }
-  .step-active   { background-color: var(--color-primary); color: #2b68c9; }
-  .step-completed { background-color: var(--color-turquoise); color: #FFFFFF; }
-  .step-inactive  { background-color: #E5E7EB; color: #9CA3AF; }
+  .sidebar-item-active {
+    background-color: rgba(24, 119, 201, 0.12);
+    color: var(--color-primary);
+    border-radius: 10px;
+  }
 
+  /* Wizard Steps */
+  .step-active { background-color: var(--color-primary); color: #FFFFFF; }
+  .step-completed { background-color: var(--color-turquoise); color: #FFFFFF; }
+  .step-inactive { background-color: #E5E7EB; color: #9CA3AF; }
+
+  /* Custom Buttons */
   .whatsapp-btn {
     background-color: #25D366;
     color: #FFFFFF;
@@ -237,21 +239,6 @@
     font-weight: 600;
     transition: background-color 150ms ease, transform 100ms ease;
   }
-  .whatsapp-btn:hover  { background-color: #1db954; }
+  .whatsapp-btn:hover { background-color: #1db954; }
   .whatsapp-btn:active { transform: scale(0.97); }
-
-  .shadow-card       { box-shadow: 0 2px 12px rgba(10, 37, 64, 0.08); }
-  .shadow-card-hover { box-shadow: 0 8px 28px rgba(10, 37, 64, 0.14); }
-  .focus-ring:focus  { outline: none; box-shadow: 0 0 0 3px rgba(24, 119, 201, 0.25); }
-
-  .animate-fade-in  { animation: fadeIn 300ms ease forwards; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .animate-slide-up { animation: slideUp 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
 }

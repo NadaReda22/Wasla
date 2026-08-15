@@ -10,13 +10,14 @@
 --}}
 @php
     $busImages = $busImages ?? [
-        ['id' => 'bus-ext-1', 'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_16d3213d8-1783615095987.png', 'alt' => 'Wasla modern white tourist coach bus exterior parked at Naama Bay Sharm El-Sheikh', 'label' => 'Exterior — Main Fleet Coach', 'type' => 'exterior'],
-        ['id' => 'bus-ext-2', 'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_13e330997-1783615096269.png', 'alt' => 'Wasla luxury tourist bus exterior front view with blue branding in Sharm El-Sheikh', 'label' => 'Exterior — Airport Transfer Bus', 'type' => 'exterior'],
-        ['id' => 'bus-int-1', 'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_1c0ff66ac-1772678050409.png', 'alt' => 'Interior of Wasla air-conditioned tourist bus with comfortable reclining seats and USB charging ports', 'label' => 'Interior — Reclining Seats & A/C', 'type' => 'interior'],
-        ['id' => 'bus-int-2', 'src' => 'https://images.unsplash.com/photo-1599920156188-64697310927d', 'alt' => 'Wasla bus interior showing clean aisle, overhead luggage racks and panoramic windows', 'label' => 'Interior — Panoramic Windows', 'type' => 'interior'],
-        ['id' => 'bus-int-3', 'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_1262cf567-1766836067593.png', 'alt' => 'Modern tourist minibus interior with leather seats and air conditioning vents', 'label' => 'Interior — Premium Minibus', 'type' => 'interior'],
-        ['id' => 'bus-ext-3', 'src' => 'https://img.rocket.new/generatedImages/rocket_gen_img_18221c7ab-1783615097170.png', 'alt' => 'Tourist bus driving along Red Sea coastal road in Sharm El-Sheikh Egypt', 'label' => 'Exterior — Coastal Route', 'type' => 'exterior'],
-    ];
+        ['id' => 'bus-ext-1', 'src' => 'images/bus-showcase/vehicle1.png', 'alt' => 'Wasla modern white tourist coach bus exterior parked at Naama Bay Sharm El-Sheikh', 'label' => 'Exterior — Main Fleet Coach', 'type' => 'exterior'],
+        ['id' => 'bus-ext-2', 'src' => 'images/bus-showcase/vehicle2.png', 'alt' => 'Wasla luxury tourist bus exterior front view with blue branding in Sharm El-Sheikh', 'label' => 'Exterior — Airport Transfer Bus', 'type' => 'exterior'],
+        ['id' => 'bus-int-1', 'src' => 'images/bus-showcase/vehicle3.png', 'alt' => 'Interior of Wasla air-conditioned tourist bus with comfortable reclining seats and USB charging ports', 'label' => 'Interior — Reclining Seats & A/C', 'type' => 'interior'],
+        ['id' => 'bus-int-2', 'src' => 'images/bus-showcase/vehicle6.png', 'alt' => 'Wasla bus interior showing clean aisle, overhead luggage racks and panoramic windows', 'label' => 'Interior — Panoramic Windows', 'type' => 'interior'],
+        ['id' => 'bus-int-3', 'src' => 'images/bus-showcase/vehicle5.png', 'alt' => 'Modern tourist minibus interior with leather seats and air conditioning vents', 'label' => 'Interior — Premium Minibus', 'type' => 'interior'],
+        ['id' => 'bus-ext-3', 'src' => 'images/bus-showcase/vehicle4.png', 'alt' => 'Tourist bus driving along Red Sea coastal road in Sharm El-Sheikh Egypt', 'label' => 'Exterior — Coastal Route', 'type' => 'exterior'],
+        ['id' => 'bus-int-4', 'src' => 'images/bus-showcase/vehicle7.png', 'alt' => 'Modern tourist minibus interior with leather seats and air conditioning vents', 'label' => 'Interior — Premium Minibus', 'type' => 'interior'],
+    ]; 
 
     $features = [
         ['icon' => 'wind', 'label' => 'Full A/C', 'desc' => 'Arctic-cold air conditioning on every bus'],
