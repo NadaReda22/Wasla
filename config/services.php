@@ -35,4 +35,17 @@ return [
         ],
     ],
 
+     'green_api' => [
+        'host' => env('GREEN_API_HOST', 'https://api.greenapi.com'),
+        'instance_id' => env('GREEN_API_INSTANCE_ID'),
+        'token' => env('GREEN_API_TOKEN'),
+    ],
+
+    'kashier' => [
+    'base_url' => env('KASHIER_BASE_URL'),
+    'merchant_id' => env('KASHIER_MERCHANT_ID'),
+    'api_key' => env('KASHIER_API_KEY'),
+    'webhook_secret' => env('KASHIER_WEBHOOK_SECRET'),
+],
+
 ];

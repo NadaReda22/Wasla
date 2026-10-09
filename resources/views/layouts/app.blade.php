@@ -5,18 +5,18 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $brandName }}</title>
-    
+
     <!-- Browser Tab Icon (Favicon) -->
     <link rel="icon" href="{{ $favicon }}" type="image/png">
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-   
+
 </head>
 <body class="bg-white text-navy font-sans antialiased flex flex-col min-h-screen">
 

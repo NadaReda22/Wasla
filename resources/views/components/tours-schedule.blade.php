@@ -1,14 +1,22 @@
 @props(['days'])
 
+@php
+    // Dynamic Settings Translation Check for Announcement Card
+    $settings = \App\Models\Setting::first();
+    $announcementText = app()->getLocale() === 'ru' && !empty($settings?->announcement_card_text_ru) 
+        ? $settings->announcement_card_text_ru 
+        : ($settings?->announcement_card_text ?: __('home.best_rates_desc'));
+@endphp
+
 <section class="section-padding bg-sand-light" id="tours">
     <div class="container-max">
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
             <div>
                 <div class="inline-flex items-center gap-2 bg-coral/15 text-coral px-4 py-2 rounded-full text-sm font-semibold mb-4">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    Live Schedule
+                    {{ __('home.live_schedule') }}
                 </div>
-                <h2 class="text-3xl sm:text-4xl font-display font-bold text-navy mb-2">All Tours &mdash; Book Any Day</h2>
+                <h2 class="text-3xl sm:text-4xl font-display font-bold text-navy mb-2">{{ __('home.all_tours') }}</h2>
                 
                 @if(count($days) > 0)
                 <p class="text-navy/60 flex items-center gap-2" id="dynamic-date-label">
@@ -20,16 +28,16 @@
             <div class="card flex items-center gap-4 px-6 py-4 shrink-0">
                 <svg class="w-7 h-7 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2" /></svg>
                 <div>
-                    <div class="text-2xl font-bold text-navy">Best Rates</div>
-                    <div class="text-xs text-navy/50">{{ $settings?->announcement_card_text ?: 'Secure your seat with a tiny online deposit' }}</div>
+                    <div class="text-2xl font-bold text-navy">{{ __('home.best_rates') }}</div>
+                    <div class="text-xs text-navy/50">{{ $announcementText }}</div>
                 </div>
             </div>
         </div>
 
         @if(count($days) === 0)
             <div class="text-center py-12 bg-white rounded-xl border border-navy/10">
-                <h3 class="text-xl font-bold text-navy">No scheduled tours found.</h3>
-                <p class="text-navy/60 mt-2">Please check back later for upcoming departures.</p>
+                <h3 class="text-xl font-bold text-navy">{{ __('home.no_tours_found') }}</h3>
+                <p class="text-navy/60 mt-2">{{ __('home.check_back_later') }}</p>
             </div>
         @else
             {{-- Day selector --}}
@@ -56,7 +64,7 @@
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                         </button>
                         <button type="button" class="carousel-arrow flex absolute right-1 md:right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-11 md:h-11 rounded-full bg-white shadow-lg border border-navy/10 items-center justify-center text-navy hover:bg-navy hover:text-white transition-colors" data-carousel-next aria-label="Next tours">
-                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7-7" /></svg>
                         </button>
 
                         <div class="tour-carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 px-12 md:px-16" data-carousel-track>
@@ -67,53 +75,62 @@
                                     <img src="{{ $tour['image'] }}" alt="{{ $tour['alt'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                                     <div class="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent"></div>
                                     
-                                    <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white shadow-sm" style="background-color: {{ $tour['tagColor'] }};">
-                                        {{ $tour['tag'] }}
-                                    </span>
+                                    <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white shadow-sm" style="background-color: {{ $tour['tagColor'] }};">
+                                            {{ $tour['tag'] }}
+                                        </span>
+                                        @if(!empty($tour['is_bus_staying']))
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-navy/80 text-white border border-white/20 shadow-sm backdrop-blur-sm">
+                                                🔒 {{ __('home.full_stay') }}
+                                            </span>
+                                        @endif
+                                    </div>
 
                                     <div class="absolute bottom-2.5 left-2.5 right-2.5">
-                                        <div class="text-white font-bold text-base leading-tight truncate">{{ $tour['name'] }}</div>
+                                        {{-- Dynamic Title based on Locale --}}
+                                        <div class="text-white font-bold text-base leading-tight truncate">
+                                            {{ app()->getLocale() === 'ru' && !empty($tour['name_ru']) ? $tour['name_ru'] : $tour['name'] }}
+                                        </div>
                                         <div class="text-white/70 text-[11px]">{{ $tour['arabicName'] }}</div>
                                     </div>
                                 </div>
 
                                 {{-- Card Body Content --}}
                                 <div class="p-3.5 sm:p-4 flex flex-col flex-grow justify-between">
-                           <div>
-              {{-- ========================================== --}}
-                {{-- 1. ENGLISH DESCRIPTION BLOCK                 --}}
-                {{-- ========================================== --}}
-                @if(!empty($tour['description']) || !empty($tour['description_en']))
-                    <div class="relative mb-3 group/en cursor-pointer">
-                        {{-- Text container: Clamped to 2 lines, expands fully on hover --}}
-                        <div class="text-navy/70 text-xs leading-relaxed prose prose-sm max-w-none line-clamp-2 group-hover/en:line-clamp-none transition-all duration-300">
-                            {!! $tour['description'] ?? $tour['description_en'] ?? '' !!}
-                        </div>
-                        
-                        {{-- English Read More Hint --}}
-                        <div class="text-[10px] font-bold text-[#1877C9] mt-1 group-hover/en:hidden">
-                            Read more...
-                        </div>
-                    </div>
-                @endif
+                                    <div>
+                                        {{-- Dynamic Description based on Locale --}}
+                                        @if(app()->getLocale() === 'ru' && !empty($tour['description_ru']))
+                                            <div class="relative mb-3 group/desc cursor-pointer">
+                                                <div class="text-navy/70 text-xs leading-relaxed prose prose-sm max-w-none line-clamp-2 group-hover/desc:line-clamp-none transition-all duration-300">
+                                                    {!! $tour['description_ru'] !!}
+                                                </div>
+                                                <div class="text-[10px] font-bold text-[#1877C9] mt-1 group-hover/desc:hidden">
+                                                    {{ __('home.read_more') }}
+                                                </div>
+                                            </div>
+                                        @elseif(!empty($tour['description']) || !empty($tour['description_en']))
+                                            <div class="relative mb-3 group/desc cursor-pointer">
+                                                <div class="text-navy/70 text-xs leading-relaxed prose prose-sm max-w-none line-clamp-2 group-hover/desc:line-clamp-none transition-all duration-300">
+                                                    {!! $tour['description'] ?? $tour['description_en'] ?? '' !!}
+                                                </div>
+                                                <div class="text-[10px] font-bold text-[#1877C9] mt-1 group-hover/desc:hidden">
+                                                    {{ __('home.read_more') }}
+                                                </div>
+                                            </div>
+                                        @endif
 
-              {{-- ========================================== --}}
-                    {{-- 2. ARABIC DESCRIPTION BLOCK                  --}}
-                    {{-- ========================================== --}}
-                    @if(!empty($tour['description_ar']))
-                        <div class="relative mb-3 group/ar cursor-pointer" dir="rtl">
-                            {{-- Text container: Clamped to 2 lines, expands fully on hover --}}
-                            <div class="text-navy/70 text-xs leading-relaxed prose prose-sm max-w-none line-clamp-2 group-hover/ar:line-clamp-none transition-all duration-300">
-                                {!! $tour['description_ar'] !!}
-                            </div>
-                            
-                            {{-- Arabic Read More Hint --}}
-                            <div class="text-[10px] font-bold text-[#1877C9] mt-1 group-hover/ar:hidden">
-                                اقرأ المزيد...
-                            </div>
-                        </div>
-                    @endif
-                                    {{-- Location and Seats Row --}}
+                                        @if(app()->getLocale() !== 'ru' && !empty($tour['description_ar']))
+                                            <div class="relative mb-3 group/ar cursor-pointer" dir="rtl">
+                                                <div class="text-navy/70 text-xs leading-relaxed prose prose-sm max-w-none line-clamp-2 group-hover/ar:line-clamp-none transition-all duration-300">
+                                                    {!! $tour['description_ar'] !!}
+                                                </div>
+                                                <div class="text-[10px] font-bold text-[#1877C9] mt-1 group-hover/ar:hidden">
+                                                    اقرأ المزيد...
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        {{-- Location and Seats Row --}}
                                         <div class="flex flex-wrap items-center justify-between text-xs text-navy/50 mb-3">
                                             <span class="flex items-center gap-1 text-[11px]">
                                                 <svg class="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -122,7 +139,7 @@
                                             
                                             <span class="flex items-center gap-1 font-bold text-coral bg-coral/10 px-2 py-0.5 rounded-md text-[11px]">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-2a4 4 0 100-8 4 4 0 000 8zm6 3v2m-3-1h6" /></svg>
-                                                {{ $tour['seatsLeft'] }} Seats Left
+                                                {{ $tour['seatsLeft'] }} {{ __('home.seats_left') }}
                                             </span>
                                         </div>
 
@@ -131,22 +148,22 @@
                                         {{-- All Departures --}}
                                         <div class="mb-3">
                                             <div class="text-[11px] font-semibold text-navy/70 mb-2 flex items-center gap-1.5">
-                                                <svg class="w-3.5 h-3.5 text-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                                All Scheduled Departures
+                                                <svg class="w-3.5 h-3.5 text-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z" /></svg>
+                                                {{ __('home.all_departures') }}
                                             </div>
                                             
                                             <div class="flex flex-wrap gap-1.5">
                                                 @if(empty($tour['allDepartures']))
-                                                    <span class="text-[10px] text-navy/50 font-medium py-0.5">No active departures</span>
+                                                    <span class="text-[10px] text-navy/50 font-medium py-0.5">{{ __('home.no_active_departures') }}</span>
                                                 @else
                                                     @foreach (array_slice($tour['allDepartures'], 0, 6) as $dep)
-                                                        <span class="bg-primary/10 text-primary text-[10px] font-semibold px-2 py-1 rounded-md">
+                                                        <span class="bg-primary/10 text-primary text-[10px] font-semibold px-2 py-1 rounded-md whitespace-nowrap">
                                                             {{ $dep }}
                                                         </span>
                                                     @endforeach
                                                     @if(count($tour['allDepartures']) > 6)
-                                                        <span class="bg-sand-light text-navy/50 text-[10px] font-semibold px-2 py-1 rounded-md">
-                                                            +{{ count($tour['allDepartures']) - 6 }} more
+                                                        <span class="bg-sand-light text-navy/50 text-[10px] font-semibold px-2 py-1 rounded-md whitespace-nowrap">
+                                                            +{{ count($tour['allDepartures']) - 6 }} {{ __('home.more') }}
                                                         </span>
                                                     @endif
                                                 @endif
@@ -159,13 +176,13 @@
                                         @if(!empty($tour['microbusOffers']))
                                             <div class="bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/40 rounded-lg p-2.5 mb-2.5 shadow-sm flex flex-col w-full">
                                                 <div class="text-[10px] font-bold text-navy uppercase tracking-wider mb-2 flex items-center gap-1">
-                                                    🚌 Shared Microbus
+                                                    🚌 {{ __('home.shared_microbus') }}
                                                 </div>
                                                 <div class="space-y-1.5 mt-auto">
                                                     @foreach ($tour['microbusOffers'] as $tier)
                                                         <div class="flex items-center justify-between text-xs">
                                                             <div class="text-navy font-medium truncate pr-1 text-[11px]">
-                                                                {{ $tier['offerName'] }} <span class="text-navy/50 font-normal">({{ $tier['paxCount'] }} Pax • {{ $tier['tripLabel'] }})</span>
+                                                                {{ $tier['offerName'] }} <span class="text-navy/50 font-normal">({{ $tier['paxCount'] }} {{ __('home.pax') }} • {{ $tier['tripLabel'] === 'Round Trip' ? __('booking.step1.round_trip') : __('booking.step1.one_way') }})</span>
                                                             </div>
                                                             <div class="text-right flex items-center gap-1.5 flex-shrink-0">
                                                                 @if(isset($tier['discountPercentage']) && $tier['discountPercentage'] > 0)
@@ -189,13 +206,13 @@
                                             <div class="bg-white border border-navy/10 rounded-lg p-2.5 mb-2.5">
                                                 <div class="flex items-center justify-start gap-1 mb-2 text-navy">
                                                     <span class="text-sm">🚗</span>
-                                                    <span class="text-[10px] font-bold uppercase tracking-wider">Private Car</span>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider">{{ __('home.private_car') }}</span>
                                                 </div>
                                                 <div class="space-y-1.5 mt-auto">
                                                     @foreach($tour['privateCarOffers'] as $tier)
                                                         <div class="flex items-center justify-between text-xs">
                                                             <div class="text-navy font-medium truncate pr-1 text-[11px]">
-                                                                {{ $tier['offerName'] }} <span class="text-navy/50 font-normal">({{ $tier['tripLabel'] }})</span>
+                                                                {{ $tier['offerName'] }} <span class="text-navy/50 font-normal">({{ $tier['tripLabel'] === 'Round Trip' ? __('booking.step1.round_trip') : __('booking.step1.one_way') }})</span>
                                                             </div>
                                                             <div class="text-right flex items-center gap-1.5 flex-shrink-0">
                                                                 @if(isset($tier['discountPercentage']) && $tier['discountPercentage'] > 0)
@@ -220,7 +237,7 @@
                                             href="{{ route('booking.create') }}?tour={{ $tour['id'] }}{{ $day['iso'] ? '&date='.$day['iso'] : '' }}"
                                             class="btn-primary w-full py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all hover:shadow-md hover:shadow-primary/30"
                                         >
-                                           Book
+                                           {{ __('home.book') }}
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                                         </a>
                                     </div>
@@ -234,8 +251,8 @@
         @endif
 
         <div class="mt-8 card p-5 text-center">
-            <p class="text-navy font-semibold text-sm mb-0.5">💳 Secure your private or shared ride with an easy online deposit</p>
-            <p class="text-navy/60 text-xs">Pay the remaining cash balance safely on board with the driver.</p>
+            <p class="text-navy font-semibold text-sm mb-0.5">💳 {{ __('home.secure_payment') }}</p>
+            <p class="text-navy/60 text-xs">{{ __('home.pay_on_board') }}</p>
         </div>
     </div>
 </section>

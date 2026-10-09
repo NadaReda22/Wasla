@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TourPricingTier extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'tour_id', 'vehicle_type', 'trip_type', 'pax_count', 'is_base',
         'offer_name', 'total_price', 'deposit_amount', 'is_active',
@@ -22,7 +25,7 @@ class TourPricingTier extends Model
 
     public function tour()
     {
-        return $this->belongsTo(Tour::class);
+        return $this->belongsTo(Tour::class)->withTrashed();
     }
 
     /**

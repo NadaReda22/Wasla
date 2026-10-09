@@ -8,6 +8,8 @@ class Faq extends Model
     protected $fillable = [
         'question_en',
         'answer_en',
+        'question_ru',
+        'answer_ru',    
         'sort_order',
         'is_active',
     ];

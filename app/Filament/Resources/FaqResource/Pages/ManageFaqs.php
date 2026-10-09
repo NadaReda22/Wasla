@@ -1,80 +1,84 @@
 <?php
+
 namespace App\Filament\Resources\FaqResource\Pages;
 
 use App\Filament\Resources\FaqResource;
 use App\Models\Faq;
-use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 
 class ManageFaqs extends Page
 {
     protected static string $resource = FaqResource::class;
+
     protected static string $view = 'filament.pages.manage-faqs';
-
-    public Collection $faqs;
-
-    public function mount(): void
-    {
-        $this->faqs = Faq::ordered()->get();
-    }
-
-    // ---------- Actions ----------
-    public function deleteAction(): Action
-    {
-        return Action::make('delete')
-            ->label('Delete FAQ')
-            ->icon('heroicon-o-trash')
-            ->color('danger')
-            ->requiresConfirmation()
-            ->modalDescription('Are you sure you want to delete this FAQ?')
-            ->action(function (array $arguments) {
-                $faq = Faq::findOrFail($arguments['faq']);
-                $faq->delete();
-
-                $this->faqs = Faq::ordered()->get();
-
-                Notification::make()
-                    ->title('FAQ deleted')
-                    ->success()
-                    ->send();
-            });
-    }
-
-    public function toggleActiveAction(): Action
-    {
-        return Action::make('toggleActive')
-            ->label(fn (array $arguments) => Faq::find($arguments['faq'])?->is_active ? 'Deactivate' : 'Activate')
-            ->icon(fn (array $arguments) => Faq::find($arguments['faq'])?->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-            ->color(fn (array $arguments) => Faq::find($arguments['faq'])?->is_active ? 'gray' : 'success')
-            ->action(function (array $arguments) {
-                $faq = Faq::findOrFail($arguments['faq']);
-                $faq->update(['is_active' => !$faq->is_active]);
-
-                $this->faqs = Faq::ordered()->get();
-
-                Notification::make()
-                    ->title($faq->is_active ? 'FAQ activated' : 'FAQ deactivated')
-                    ->success()
-                    ->send();
-            });
-    }
-
-    // ---------- Header ----------
-    protected function getHeaderActions(): array
-    {
-        return [
-            CreateAction::make()
-                ->label('Add FAQ')
-                ->icon('heroicon-o-plus')
-                ->url(fn () => FaqResource::getUrl('create')),   // <-- this tells it where to go
-        ];
-    }
 
     public function getTitle(): string
     {
-        return 'FAQs';
+        return __('admin.nav.faqs');
+    }
+
+    /** Used by the Blade view as $this->faqs */
+    public function getFaqsProperty(): Collection
+    {
+        return Faq::orderBy('sort_order')->get();
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            // Without ->model(), CreateAction does `new $model` on null => "Class name must be a valid object or a string".
+            Actions\CreateAction::make()
+                ->model(Faq::class)
+                ->label(fn () => __('admin.actions.add_faq'))
+                ->icon('heroicon-o-plus')
+                ->form(fn (Form $form) => FaqResource::form($form))
+                ->createAnother(false),
+        ];
+    }
+
+    // Card buttons call these by name: mountAction('edit' | 'delete' | 'toggleActive', { faq: id })
+
+    public function editAction(): Actions\EditAction
+    {
+        return Actions\EditAction::make('edit')
+            ->model(Faq::class)
+            ->record(fn (array $arguments) => Faq::findOrFail($arguments['faq']))
+            ->form(fn (Form $form) => FaqResource::form($form))
+            ->color('warning');
+    }
+
+    public function deleteAction(): Actions\Action
+    {
+        return Actions\Action::make('delete')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading(fn () => __('admin.actions.delete_faq'))
+            ->modalDescription(fn () => __('admin.notifications.delete_faq_desc'))
+            ->action(function (array $arguments): void {
+                Faq::find($arguments['faq'])?->delete();
+
+                Notification::make()
+                    ->title(__('admin.notifications.faq_deleted'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function toggleActiveAction(): Actions\Action
+    {
+        return Actions\Action::make('toggleActive')
+            ->action(function (array $arguments): void {
+                $faq = Faq::findOrFail($arguments['faq']);
+                $faq->update(['is_active' => ! $faq->is_active]);
+
+                Notification::make()
+                    ->title(__($faq->is_active ? 'admin.notifications.faq_activated' : 'admin.notifications.faq_deactivated'))
+                    ->success()
+                    ->send();
+            });
     }
 }

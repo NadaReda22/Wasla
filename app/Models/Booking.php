@@ -11,6 +11,8 @@ class Booking extends Model
     // Cast dates to proper Carbon instances
     protected $casts = [
         'booking_date' => 'date',
+        'is_cash_on_board_paid' => 'boolean',
+        'is_distribution_ensured' => 'boolean',
     ];
 
     public function client()
@@ -20,37 +22,54 @@ class Booking extends Model
 
     public function tour()
     {
-        return $this->belongsTo(Tour::class);
+        return $this->belongsTo(Tour::class)->withTrashed();
     }
+
 
     public function departure()
     {
-        return $this->belongsTo(TourDeparture::class, 'tour_departure_id');
+        return $this->belongsTo(TourDeparture::class, 'tour_departure_id')->withTrashed();
     }
 
     public function pricingTier()
     {
-        return $this->belongsTo(TourPricingTier::class, 'tour_pricing_tier_id');
+        return $this->belongsTo(TourPricingTier::class, 'tour_pricing_tier_id')->withTrashed();
     }
 
-    public function hotel()
+    public function area()
     {
-        return $this->belongsTo(Hotel::class);
+        return $this->belongsTo(Area::class);
     }
 
-    public function vehicle()
+    public function outboundVehicle()
     {
-        return $this->belongsTo(Vehicle::class);
+        return $this->belongsTo(Vehicle::class, 'outbound_vehicle_id');
     }
 
-    // Round Trip Relations
-    public function parentBooking()
+    public function returnVehicle()
     {
-        return $this->belongsTo(Booking::class, 'parent_booking_id');
+        return $this->belongsTo(Vehicle::class, 'return_vehicle_id');
     }
 
-    public function returnBooking()
+    public function payment()
     {
-        return $this->hasOne(Booking::class, 'parent_booking_id');
+        return $this->hasOne(Payment::class);
     }
+
+    protected static function booted(): void
+{
+    static::updating(function (Booking $b) {
+        if (!$b->getOriginal('is_distribution_ensured')) return;
+
+        $allowed = ['is_cash_on_board_paid', 'whatsapp_status', 'updated_at'];
+        if (array_diff(array_keys($b->getDirty()), $allowed)) {
+            throw new \DomainException('This booking is locked.');
+        }
+    });
+
+    static::deleting(function (Booking $b) {
+        if ($b->is_distribution_ensured) throw new \DomainException('This booking is locked.');
+    });
+}
+
 }

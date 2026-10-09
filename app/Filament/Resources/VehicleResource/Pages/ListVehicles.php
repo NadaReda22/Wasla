@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\BusResource\Pages;
+namespace App\Filament\Resources\VehicleResource\Pages;
 
-use App\Filament\Resources\BusResource;
+use App\Filament\Resources\VehicleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListBuses extends ListRecords
+class ListVehicles extends ListRecords
 {
-    protected static string $resource = BusResource::class;
+    protected static string $resource = VehicleResource::class;
 
     protected function getHeaderActions(): array
     {

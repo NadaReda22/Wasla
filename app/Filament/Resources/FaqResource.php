@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FaqResource\Pages;
@@ -14,50 +15,82 @@ class FaqResource extends Resource
     protected static ?string $model = Faq::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
-    protected static ?string $navigationGroup = 'Content';
     protected static ?int $navigationSort = 2;
-    protected static ?string $label = 'FAQs';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.groups.content');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.nav.faqs');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.models.faq');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.models.faqs');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('FAQ Content')
+                Forms\Components\Section::make(fn () => __('admin.sections.faq_en'))
                     ->icon('heroicon-o-document-text')
                     ->collapsible()
                     ->schema([
                         Forms\Components\TextInput::make('question_en')
-                            ->label('Question')
+                            ->label(fn () => __('admin.fields.question_en'))
                             ->required()
                             ->maxLength(255)
                             ->columnSpanFull(),
                         Forms\Components\RichEditor::make('answer_en')
-                            ->label('Answer')
+                            ->label(fn () => __('admin.fields.answer_en'))
                             ->required()
                             ->columnSpanFull()
                             ->toolbarButtons([
-                                'bold',
-                                'italic',
-                                'underline',
-                                'link',
-                                'bulletList',
-                                'orderedList',
+                                'bold', 'italic', 'underline', 'link',
+                                'bulletList', 'orderedList',
                             ]),
                     ]),
 
-                Forms\Components\Section::make('Settings')
+                Forms\Components\Section::make(fn () => __('admin.sections.faq_ru'))
+                    ->icon('heroicon-o-language')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\TextInput::make('question_ru')
+                            ->label(fn () => __('admin.fields.question_ru'))
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        Forms\Components\RichEditor::make('answer_ru')
+                            ->label(fn () => __('admin.fields.answer_ru'))
+                            ->columnSpanFull()
+                            ->toolbarButtons([
+                                'bold', 'italic', 'underline', 'link',
+                                'bulletList', 'orderedList',
+                            ]),
+                    ]),
+
+                Forms\Components\Section::make(fn () => __('admin.groups.settings'))
                     ->icon('heroicon-o-cog')
                     ->collapsible()
                     ->schema([
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('sort_order')
-                                    ->label('Sort Order')
+                                    ->label(fn () => __('admin.fields.sort_order'))
                                     ->numeric()
                                     ->default(0)
-                                    ->helperText('Lower numbers appear first.'),
+                                    ->helperText(fn () => __('admin.fields.sort_order_help')),
                                 Forms\Components\Toggle::make('is_active')
-                                    ->label('Active')
+                                    ->label(fn () => __('admin.columns.active'))
                                     ->default(true)
                                     ->onColor('success')
                                     ->offColor('danger'),
@@ -71,20 +104,20 @@ class FaqResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('sort_order')
-                    ->label('Order')
+                    ->label(fn () => __('admin.columns.order'))
                     ->sortable()
                     ->size('sm'),
                 Tables\Columns\TextColumn::make('question_en')
-                    ->label('Question')
+                    ->label(fn () => __('admin.columns.question'))
                     ->searchable()
                     ->limit(50),
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(fn () => __('admin.columns.active'))
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Last Updated')
-                    ->dateTime('M d, Y')
+                    ->label(fn () => __('admin.columns.last_updated'))
+                    ->formatStateUsing(fn ($state) => $state?->translatedFormat('d M Y'))
                     ->sortable(),
             ])
             ->actions([
@@ -107,8 +140,6 @@ class FaqResource extends Resource
     {
         return [
             'index' => Pages\ManageFaqs::route('/'),
-            'create' => Pages\CreateFaq::route('/create'),
-            'edit' => Pages\EditFaq::route('/{record}/edit'),
         ];
     }
 }

@@ -14,69 +14,96 @@ class AreaResource extends Resource
     protected static ?string $model = Area::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
-    protected static ?string $navigationGroup = 'Zones & Pricing';
     protected static ?int $navigationSort = 3;
-    protected static ?string $label = 'Coverage Areas';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.groups.zones_and_pricing');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.nav.areas');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.models.area');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.models.areas');
+    }
+
+    protected static function colorLabels(): array
+    {
+        return [
+            'bg-primary'     => __('admin.colors.primary'),
+            'bg-turquoise'   => __('admin.colors.turquoise'),
+            'bg-navy'        => __('admin.colors.navy'),
+            'bg-coral'       => __('admin.colors.coral'),
+            'bg-gold'        => __('admin.colors.gold'),
+            'bg-primary-400' => __('admin.colors.primary_400'),
+        ];
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Area Details')
+                Forms\Components\Section::make(fn () => __('admin.sections.area_details'))
                     ->icon('heroicon-o-map')
                     ->collapsible()
                     ->schema([
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('name_en')
-                                    ->label('Name (English)')
+                                    ->label(fn () => __('admin.fields.name_en'))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('name_ar')
-                                    ->label('Name (Arabic)')
+                                    ->label(fn () => __('admin.fields.name_ar'))
                                     ->maxLength(255),
                             ]),
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('latitude')
+                                    ->label(fn () => __('admin.fields.latitude'))
                                     ->numeric()
                                     ->step(0.00000001)
-                                    ->helperText('e.g., 27.9158'),
+                                    ->helperText(fn () => __('admin.fields.latitude_example')),
                                 Forms\Components\TextInput::make('longitude')
+                                    ->label(fn () => __('admin.fields.longitude'))
                                     ->numeric()
                                     ->step(0.00000001)
-                                    ->helperText('e.g., 34.3298'),
+                                    ->helperText(fn () => __('admin.fields.longitude_example')),
                             ]),
                     ]),
 
-                Forms\Components\Section::make('Pricing & Visibility')
+                Forms\Components\Section::make(fn () => __('admin.sections.pricing_visibility'))
                     ->icon('heroicon-o-currency-dollar')
                     ->collapsible()
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
                                 Forms\Components\Select::make('color')
-                                    ->label('Map Pin Color')
-                                    ->options([
-                                        'bg-primary' => 'Primary (Blue)',
-                                        'bg-turquoise' => 'Turquoise',
-                                        'bg-navy' => 'Navy',
-                                        'bg-coral' => 'Coral',
-                                        'bg-gold' => 'Gold',
-                                        'bg-primary-400' => 'Light Blue',
-                                    ])
-                                    ->placeholder('Random Color')
-                                    ->helperText('Leave empty for a random color.'),
-                                    
+                                    ->label(fn () => __('admin.columns.map_pin'))
+                                    ->options(fn () => self::colorLabels())
+                                    ->placeholder(fn () => __('admin.colors.random_color'))
+                                    ->helperText(fn () => __('admin.fields.color_help')),
+
+                                // Read-only in the form. ->dehydrated() keeps saving the current value
                                 Forms\Components\Toggle::make('is_in_free_zone')
-                                    ->label('Free Pickup Zone')
+                                    ->label(fn () => __('admin.columns.free_zone'))
                                     ->default(true)
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->onColor('success')
-                                    ->offColor('danger')
-                                    ->helperText('Enable if pickups here are included in the base ticket. If disabled, customers staying in this area will be subject to an extra out-of-zone transfer fee.'),
-                                    
+                                    ->offColor('danger'),
+
                                 Forms\Components\Toggle::make('is_active')
-                                    ->label('Active')
+                                    ->label(fn () => __('admin.columns.active'))
                                     ->default(true)
                                     ->onColor('success')
                                     ->offColor('danger'),
@@ -90,31 +117,30 @@ class AreaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name_en')
-                    ->label('Area')
+                    ->label(fn () => __('admin.columns.name_en'))
                     ->searchable()
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('latitude')
-                    ->label('Latitude')
+                    ->label(fn () => __('admin.fields.latitude'))
                     ->searchable()
                     ->sortable()
-                    ->toggleable(), // Allows admin to hide it if the table gets too crowded
-                    
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('longitude')
-                    ->label('Longitude')
+                    ->label(fn () => __('admin.fields.longitude'))
                     ->searchable()
                     ->sortable()
-                    ->toggleable(),
-                    
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('color')
-                    ->label('Pin Color')
+                    ->label(fn () => __('admin.columns.map_pin'))
                     ->html()
                     ->formatStateUsing(function (?string $state): string {
                         if (!$state) {
-                            return '<div class="flex items-center gap-2"><span style="background-color: #e5e7eb; width: 14px; height: 14px; border-radius: 50%; border: 1px solid #d1d5db;"></span><span class="text-sm text-gray-500">Random</span></div>';
+                            return '<div class="flex items-center gap-2"><span style="background-color: #e5e7eb; width: 14px; height: 14px; border-radius: 50%; border: 1px solid #d1d5db;"></span><span class="text-sm text-gray-500">' . e(__('admin.colors.random')) . '</span></div>';
                         }
-                        
-                        
+
                         $hexColors = [
                             'bg-primary'     => '#1877c9',
                             'bg-turquoise'   => '#48c4d8',
@@ -123,21 +149,16 @@ class AreaResource extends Resource
                             'bg-gold'        => '#d4af37',
                             'bg-primary-400' => '#60a5fa',
                         ];
-                        
+
                         $hex = $hexColors[$state] ?? '#9ca3af';
-                        $label = ucfirst(str_replace(['bg-', '-400'], ['', ' (Light)'], $state));
-                        
-                        return '<div class="flex items-center gap-2"><span style="background-color: ' . $hex . '; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span><span class="text-sm font-medium">' . $label . '</span></div>';
+                        $label = self::colorLabels()[$state] ?? $state;
+
+                        return '<div class="flex items-center gap-2"><span style="background-color: ' . $hex . '; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span><span class="text-sm font-medium">' . e($label) . '</span></div>';
                     }),
 
-                Tables\Columns\IconColumn::make('is_in_free_zone')
-                    ->label('Free Zone')
-                    ->boolean()
-                    ->sortable(),
-                    
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('Active')
-                    ->boolean()
+
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label(fn () => __('admin.columns.active'))
                     ->sortable(),
             ])
             ->actions([

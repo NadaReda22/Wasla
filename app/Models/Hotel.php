@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hotel extends Model
 {
-    protected $guarded = [];
+   protected $fillable = [
+    'area_id', 'name_en', 'name_ar', 'keywords', 'latitude', 'longitude', 'extra_transfer_fee', 'is_active',
+];
+
+
 
     public function area()
     {

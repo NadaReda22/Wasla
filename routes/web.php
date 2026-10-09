@@ -3,13 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookingController;
+use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\PaymentController;
+
+
 
 // =========================================================
 // 1. Static Pages
 // =========================================================
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/policies', 'pages.policies')->name('policies');
-Route::view('/instructions', 'pages.instructions')->name('instructions');
+Route::get('/instructions', [HomeController::class, 'instructions'])->name('instructions');
+Route::view('/terms', 'pages.terms')->name('terms');
+Route::view('/refund-policy', 'pages.refund-policy')->name('refund-policy');
+Route::view('/privacy-policy', 'pages.privacy')->name('privacy');
 
 // =========================================================
 // 2. Dynamic Pages (Handled by HomeController)
@@ -22,10 +29,32 @@ Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 // =========================================================
 Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
 Route::post('/book', [BookingController::class, 'store'])->name('booking.store');
+Route::get('/book/active-hotels', [BookingController::class, 'getActiveHotels'])->name('booking.hotels');
 
 // =========================================================
 // 4. Payment Checkout Placeholder
 // =========================================================
-Route::get('/checkout/{reference}', function($reference) {
-    return "Redirecting to payment gateway for $reference...";
-})->name('payment.checkout');
+// Redirect target for tourists after paying on Kashier
+Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+
+// Server-to-server webhook notification (requires CSRF exemption if kept here)
+Route::post('/payment/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
+
+// =========================================================
+// 4. Translation
+// =========================================================
+Route::get('/lang/{locale}', function (string $locale) {
+    if (in_array($locale, ['en', 'ru'])) {
+        session(['locale' => $locale]);
+    }
+    return back();
+})->name('lang.switch');
+
+
+
+Route::get('/admin/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'ar'])) {
+        Session::put('filament_locale', $locale);
+    }
+    return redirect()->back();
+})->name('admin.lang.switch');

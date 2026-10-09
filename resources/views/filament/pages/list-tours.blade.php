@@ -66,7 +66,8 @@
         .wp-price-pill__value { margin-top: 2px; font-size: 16px; font-weight: 800; color: #0A2540; }
         .wp-price-pill.is-total .wp-price-pill__value { color: #1877C9; }
 
-        .wp-dep-time { text-align: center; margin-top: 14px; font-size: 2.2rem; font-weight: 900; letter-spacing: -0.02em; color: #ffffff; }
+        .wp-dep-time { text-align: center; margin-top: 14px; font-size: 2.2rem; font-weight: 900; letter-spacing: -0.02em; color: #ffffff; line-height: 1; }
+        .wp-ret-time { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 1rem; color: rgba(255,255,255,0.8); margin-top: 6px; font-weight: 700; }
 
         .wp-actions { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid #e5e7eb; }
         .wp-toggle { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 5px 10px; font-size: 11px; font-weight: 800; background: rgba(23,162,184,0.1); color: #0E7A8C; border: none; cursor: pointer; }
@@ -82,35 +83,36 @@
     <div x-data="{
         scrollContainer(id, direction) {
             const container = document.getElementById(id);
-            container.scrollBy({ left: direction === 'left' ? -400 : 400, behavior: 'smooth' });
+            const scrollAmount = document.dir === 'rtl' ? (direction === 'left' ? 400 : -400) : (direction === 'left' ? -400 : 400);
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
     }" class="space-y-8">
 
         {{-- ========== PRICING OFFERS ========== --}}
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <div class="flex items-center justify-between mb-5">
+            <div class="flex flex-wrap items-center justify-between mb-5 gap-4">
                 <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">
                     <x-heroicon-o-tag class="w-6 h-6 text-[#F5B400]" />
-                    Pricing 
+                    {{ __('admin.list_tours.pricing') ?? 'Pricing' }}
                 </h2>
                 <div class="flex items-center gap-3">
                     @if($this->selectedPricingOfferId)
                         <button wire:click="clearPricingFilter"
                                 class="inline-flex items-center px-3 py-1.5 text-sm font-bold rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
-                            <x-heroicon-o-x-mark class="w-4 h-4 mr-1" />
-                            Clear Selection
+                            <x-heroicon-o-x-mark class="w-4 h-4 me-1" />
+                            {{ __('admin.actions.clear_selection') ?? 'Clear Selection' }}
                         </button>
                     @endif
                     <button wire:click="mountAction('deleteAllPricing')"
                             class="inline-flex items-center px-4 py-2 text-sm font-bold rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition">
-                        <x-heroicon-o-trash class="w-4 h-4 mr-1.5" />
-                        Delete All
+                        <x-heroicon-o-trash class="w-4 h-4 me-1.5" />
+                        {{ __('admin.actions.delete_all') ?? 'Delete All' }}
                     </button>
                     <div class="h-8 w-px bg-gray-200"></div>
-                    <button @click="scrollContainer('pricing-slider', 'left')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm">
+                    <button @click="scrollContainer('pricing-slider', 'left')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm rtl:rotate-180">
                         <x-heroicon-o-chevron-left class="w-5 h-5" />
                     </button>
-                    <button @click="scrollContainer('pricing-slider', 'right')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm">
+                    <button @click="scrollContainer('pricing-slider', 'right')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm rtl:rotate-180">
                         <x-heroicon-o-chevron-right class="w-5 h-5" />
                     </button>
                 </div>
@@ -118,62 +120,62 @@
 
             <div class="flex flex-wrap items-center gap-3 mb-5">
                 <div class="relative flex-1 min-w-[200px] max-w-sm">
-                    <x-heroicon-o-magnifying-glass class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <x-heroicon-o-magnifying-glass class="w-4 h-4 text-gray-400 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input type="text" wire:model.live.debounce.300ms="pricingSearch"
-                           placeholder=" Search offers..."
-                           class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 placeholder:text-gray-400 focus:bg-white focus:border-[#1877C9] focus:ring-2 focus:ring-[#1877C9]/15 transition">
+                           placeholder="{{ __('admin.list_tours.search_offers') ?? 'Search offers...' }}"
+                           class="w-full ps-10 pe-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 placeholder:text-gray-400 focus:bg-white focus:border-[#1877C9] focus:ring-2 focus:ring-[#1877C9]/15 transition">
                 </div>
                 
                 <div class="inline-flex bg-gray-100 rounded-xl p-1 gap-1">
                     <button wire:click="$set('pricingTypeFilter', 'all')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingTypeFilter ?? 'all') === 'all' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        All Types
+                        {{ __('admin.options.all_types') ?? 'All Types' }}
                     </button>
                     <button wire:click="$set('pricingTypeFilter', 'base')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingTypeFilter ?? 'all') === 'base' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        Base Prices
+                        {{ __('admin.options.base_prices') ?? 'Base Prices' }}
                     </button>
                     <button wire:click="$set('pricingTypeFilter', 'offer')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingTypeFilter ?? 'all') === 'offer' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        Offers
+                        {{ __('admin.options.offers') ?? 'Offers' }}
                     </button>
                 </div>
 
                 <div class="inline-flex bg-gray-100 rounded-xl p-1 gap-1">
                     <button wire:click="$set('pricingVehicleFilter', 'all')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingVehicleFilter ?? 'all') === 'all' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        All Vehicles
+                        {{ __('admin.options.all_vehicles') ?? 'All Vehicles' }}
                     </button>
                     <button wire:click="$set('pricingVehicleFilter', 'microbus')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingVehicleFilter ?? 'all') === 'microbus' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        Microbus
+                        {{ __('admin.options.microbus') ?? 'Microbus' }}
                     </button>
                     <button wire:click="$set('pricingVehicleFilter', 'private')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingVehicleFilter ?? 'all') === 'private' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        Private Car
+                        {{ __('admin.options.private_car') ?? 'Private Car' }}
                     </button>
                 </div>
 
                 <div class="inline-flex bg-gray-100 rounded-xl p-1 gap-1">
                     <button wire:click="$set('pricingTripTypeFilter', 'all')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingTripTypeFilter ?? 'all') === 'all' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        All Trips
+                        {{ __('admin.options.all_trips') ?? 'All Trips' }}
                     </button>
                     <button wire:click="$set('pricingTripTypeFilter', 'one_way')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingTripTypeFilter ?? 'all') === 'one_way' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        One Way
+                        {{ __('admin.options.one_way') ?? 'One Way' }}
                     </button>
                     <button wire:click="$set('pricingTripTypeFilter', 'round_trip')"
                             class="px-4 py-1.5 rounded-lg text-xs font-bold transition {{ ($pricingTripTypeFilter ?? 'all') === 'round_trip' ? 'bg-white shadow-sm text-[#0A2540]' : 'text-gray-500 hover:text-gray-700' }}">
-                        Round Trip
+                        {{ __('admin.options.round_trip') ?? 'Round Trip' }}
                     </button>
                 </div>
 
                 @if(!empty($pricingSearch) || ($pricingTripTypeFilter ?? 'all') !== 'all' || ($pricingVehicleFilter ?? 'all') !== 'all' || ($pricingTypeFilter ?? 'all') !== 'all')
                     <button wire:click="clearPricingCardFilters"
                             class="inline-flex items-center px-3 py-2 text-sm font-bold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition border border-red-200">
-                        <x-heroicon-o-x-mark class="w-4 h-4 mr-1" />
-                        Clear Filters
+                        <x-heroicon-o-x-mark class="w-4 h-4 me-1" />
+                        {{ __('admin.actions.clear_filters') ?? 'Clear Filters' }}
                     </button>
                 @endif
             </div>
@@ -191,8 +193,8 @@
 
                             <div class="wp-card__header {{ $tier->is_base ? 'is-base' : '' }}">
                                 
-                                <div class="absolute top-0 right-0 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-bl-xl shadow-sm {{ $tier->is_base ? 'bg-[#0A2540] text-[#48c4d8]' : 'bg-[#E63946] text-white' }}">
-                                    {{ $tier->is_base ? 'Base Price' : 'Special Offer' }}
+                                <div class="absolute top-0 end-0 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest {{ app()->getLocale() === 'ar' ? 'rounded-br-xl' : 'rounded-bl-xl' }} shadow-sm {{ $tier->is_base ? 'bg-[#0A2540] text-[#48c4d8]' : 'bg-[#E63946] text-white' }}">
+                                    {{ $tier->is_base ? (__('admin.list_tours.base_price') ?? 'Base Price') : (__('admin.list_tours.special_offer') ?? 'Special Offer') }}
                                 </div>
 
                                 <div class="wp-card__toprow mt-4">
@@ -203,7 +205,7 @@
                                             @else
                                                 <x-heroicon-o-users class="wp-icon-10" />
                                             @endif
-                                            {{ ucfirst($tier->vehicle_type) }}
+                                            {{ $tier->vehicle_type === 'private' ? (__('admin.options.private_car') ?? 'Private Car') : (__('admin.options.microbus') ?? 'Microbus') }}
                                         </span>
                                         <span class="wp-pill-white">
                                             @if($tier->trip_type === 'round_trip')
@@ -211,28 +213,34 @@
                                             @else
                                                 <x-heroicon-o-arrow-right class="wp-icon-10" />
                                             @endif
-                                            {{ str_replace('_', ' ', $tier->trip_type) }}
+                                            {{ $tier->trip_type === 'round_trip' ? (__('admin.options.round_trip') ?? 'Round Trip') : (__('admin.options.one_way') ?? 'One Way') }}
                                         </span>
                                     </div>
 
                                     <span style="display:flex; align-items:center; gap:6px;">
                                         <span class="wp-pill-ghost">
                                             <x-heroicon-o-user-group class="wp-icon-10" />
-                                            {{ $tier->pax_count }} Pax
+                                            {{ $tier->pax_count }} {{ __('admin.columns.pax') ?? 'Pax' }}
                                         </span>
                                     </span>
                                 </div>
 
                                 <div class="wp-offer-name">
-                                    {{-- Output EXACT database name, and show every Tour this card applies to! --}}
                                     {{ $tier->offer_name }}
 
                                     <div class="wp-tours-list">
                                         <x-heroicon-o-map-pin class="w-3 h-3 mt-0.5 flex-shrink-0" />
                                         @if($cardTours->isEmpty())
-                                            <span>All Tours (Global)</span>
+                                            <span>{{ __('admin.list_tours.all_tours_global') ?? 'All Tours (Global)' }}</span>
                                         @else
-                                            <span>{{ $cardTours->pluck('name_en')->implode(', ') }}</span>
+                                            <div class="flex flex-col">
+                                                <span>{{ app()->getLocale() === 'ar' ? $cardTours->pluck('name_ar')->filter()->implode(', ') : $cardTours->pluck('name_en')->implode(', ') }}</span>
+                                                @if(app()->getLocale() !== 'ar' && $cardTours->pluck('name_ru')->filter()->isNotEmpty())
+                                                    <span class="text-[9px] text-white/60 font-medium mt-0.5">
+                                                        {{ $cardTours->pluck('name_ru')->filter()->implode(', ') }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -240,11 +248,11 @@
 
                             <div class="wp-prices">
                                 <div class="wp-price-pill">
-                                    <div class="wp-price-pill__label">Deposit</div>
+                                    <div class="wp-price-pill__label">{{ __('admin.fields.deposit_amount') ?? 'Deposit' }}</div>
                                     <div class="wp-price-pill__value">${{ number_format($tier->deposit_amount, 0) }}</div>
                                 </div>
                                 <div class="wp-price-pill is-total">
-                                    <div class="wp-price-pill__label">Total</div>
+                                    <div class="wp-price-pill__label">{{ __('admin.fields.total_price') ?? 'Total' }}</div>
                                     <div class="wp-price-pill__value">${{ number_format($tier->total_price, 0) }}</div>
                                 </div>
                             </div>
@@ -253,7 +261,7 @@
                                 <button wire:click.stop="togglePricingActive({{ $tier->id }})"
                                         class="wp-toggle {{ !$tier->is_active ? 'is-paused' : '' }}">
                                     <x-heroicon-s-power class="wp-icon-10" />
-                                    {{ $tier->is_active ? 'Active' : 'Paused' }}
+                                    {{ $tier->is_active ? (__('admin.list_tours.active') ?? 'Active') : (__('admin.list_tours.paused') ?? 'Paused') }}
                                 </button>
                                 <div style="display:flex; align-items:center; gap:4px;">
                                     <button wire:click.stop="mountAction('editPricingOffer', { id: {{ $tier->id }} })" aria-label="Edit" class="wp-icon-btn">
@@ -269,37 +277,37 @@
                 </div>
             @else
                 <div class="text-center py-12 text-gray-400 text-sm font-medium">
-                    No pricing configurations match your search or filter.
+                    {{ __('admin.list_tours.no_pricing_found') ?? 'No pricing configurations match your search or filter.' }}
                 </div>
             @endif
         </div>
 
         {{-- ========== DEPARTURE TIMES ========== --}}
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <div class="flex items-center justify-between mb-5">
+            <div class="flex flex-wrap items-center justify-between mb-5 gap-4">
                 <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">
                     <x-heroicon-o-clock class="w-6 h-6 text-[#F5B400]" />
-                    Departure Times
+                    {{ __('admin.list_tours.departure_times') ?? 'Departure Times' }}
                 </h2>
                 <div class="flex items-center gap-3">
-                    <button wire:click="mountAction('deleteAllDepartures')" class="inline-flex items-center px-4 py-2 text-sm font-bold rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition"><x-heroicon-o-trash class="w-4 h-4 mr-1.5" /> Delete All</button>
+                    <button wire:click="mountAction('deleteAllDepartures')" class="inline-flex items-center px-4 py-2 text-sm font-bold rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition"><x-heroicon-o-trash class="w-4 h-4 me-1.5" /> {{ __('admin.actions.delete_all') ?? 'Delete All' }}</button>
                     <div class="h-8 w-px bg-gray-200"></div>
-                    <button @click="scrollContainer('time-slider', 'left')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm"><x-heroicon-o-chevron-left class="w-5 h-5" /></button>
-                    <button @click="scrollContainer('time-slider', 'right')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm"><x-heroicon-o-chevron-right class="w-5 h-5" /></button>
+                    <button @click="scrollContainer('time-slider', 'left')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm rtl:rotate-180"><x-heroicon-o-chevron-left class="w-5 h-5" /></button>
+                    <button @click="scrollContainer('time-slider', 'right')" class="p-2.5 rounded-full bg-gray-50 hover:bg-gray-200 border border-gray-200 text-gray-700 transition shadow-sm rtl:rotate-180"><x-heroicon-o-chevron-right class="w-5 h-5" /></button>
                 </div>
             </div>
             
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5">
                 <div class="relative flex-1 max-w-xs">
-                    <x-heroicon-o-calendar class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input type="date" wire:model.live="departureDateFilter" class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 focus:bg-white focus:border-[#1877C9] focus:ring-2 focus:ring-[#1877C9]/15 transition">
+                    <x-heroicon-o-calendar class="w-4 h-4 text-gray-400 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input type="date" wire:model.live="departureDateFilter" class="w-full ps-10 pe-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 focus:bg-white focus:border-[#1877C9] focus:ring-2 focus:ring-[#1877C9]/15 transition">
                 </div>
                 <div class="relative flex-1 max-w-xs">
-                    <x-heroicon-o-clock class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input type="time" wire:model.live="departureTimeFilter" class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 focus:bg-white focus:border-[#1877C9] focus:ring-2 focus:ring-[#1877C9]/15 transition">
+                    <x-heroicon-o-clock class="w-4 h-4 text-gray-400 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input type="time" wire:model.live="departureTimeFilter" class="w-full ps-10 pe-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 focus:bg-white focus:border-[#1877C9] focus:ring-2 focus:ring-[#1877C9]/15 transition">
                 </div>
                 @if(!empty($departureDateFilter) || !empty($departureTimeFilter) || !empty($selectedDepartureId))
-                    <button wire:click="clearTimeFilter" class="inline-flex items-center px-3 py-1.5 text-sm font-bold rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition self-start sm:self-auto"><x-heroicon-o-x-mark class="w-4 h-4 mr-1" /> Clear Filter</button>
+                    <button wire:click="clearTimeFilter" class="inline-flex items-center px-3 py-1.5 text-sm font-bold rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition self-start sm:self-auto"><x-heroicon-o-x-mark class="w-4 h-4 mr-1" /> {{ __('admin.actions.clear_filters') ?? 'Clear Filters' }}</button>
                 @endif
             </div>
 
@@ -307,21 +315,34 @@
                 <div id="time-slider" class="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4 pt-2 px-1">
                     @foreach($this->availableDepartures as $dep)
                         @php
-                            $timeStr = date('H:i', strtotime($dep->departure_time));
+                            $timeStr = date('g:i A', strtotime($dep->departure_time));
+                            $returnTimeStr = $dep->return_time ? date('g:i A', strtotime($dep->return_time)) : null;
                             $dateStr = $dep->departure_date ? \Carbon\Carbon::parse($dep->departure_date)->toDateString() : '';
-                            $dateLabel = $dep->departure_date ? \Carbon\Carbon::parse($dep->departure_date)->format('D, M j') : 'Every day';
+                            $dateLabel = $dep->departure_date ? \Carbon\Carbon::parse($dep->departure_date)->format('D, M j') : (__('admin.list_tours.every_day') ?? 'Every day');
                             $isSelected = $this->selectedDepartureId === $dep->id;
                         @endphp
                         <article wire:key="dep-{{ $dep->id }}" wire:click="selectDepartureCard({{ $dep->id }})" class="wp-card wp-dep-card {{ $isSelected ? 'is-selected' : '' }} {{ !$dep->is_active ? 'is-paused' : '' }}">
                             <div class="wp-card__header">
                                 <div class="wp-card__toprow">
                                     <span class="wp-pill-white"><x-heroicon-o-calendar class="wp-icon-10" /> {{ $dateLabel }}</span>
-                                    <span class="wp-pill-ghost"><x-heroicon-o-clock class="wp-icon-10" /> Departure</span>
+                                    <span class="wp-pill-ghost">
+                                        @if($returnTimeStr)
+                                            <x-heroicon-o-arrows-right-left class="wp-icon-10" /> {{ __('admin.options.round_trip_short') ?? 'Round' }}
+                                        @else
+                                            <x-heroicon-o-arrow-right class="wp-icon-10" /> {{ __('admin.options.one_way_short') ?? 'One-way' }}
+                                        @endif
+                                    </span>
                                 </div>
                                 <div class="wp-dep-time">{{ $timeStr }}</div>
+                                @if($returnTimeStr)
+                                    <div class="wp-ret-time">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                                        {{ __('admin.list_tours.ret') ?? 'Ret:' }} {{ $returnTimeStr }}
+                                    </div>
+                                @endif
                             </div>
                             <div class="wp-actions">
-                                <button wire:click.stop="toggleDepartureActive({{ $dep->id }})" class="wp-toggle {{ !$dep->is_active ? 'is-paused' : '' }}"><x-heroicon-s-power class="wp-icon-10" /> {{ $dep->is_active ? 'Active' : 'Paused' }}</button>
+                                <button wire:click.stop="toggleDepartureActive({{ $dep->id }})" class="wp-toggle {{ !$dep->is_active ? 'is-paused' : '' }}"><x-heroicon-s-power class="wp-icon-10" /> {{ $dep->is_active ? (__('admin.list_tours.active') ?? 'Active') : (__('admin.list_tours.paused') ?? 'Paused') }}</button>
                                 <div style="display:flex; align-items:center; gap:4px;">
                                     <button wire:click.stop="mountAction('editDeparture', { id: {{ $dep->id }} })" class="wp-icon-btn"><x-heroicon-o-pencil-square class="wp-icon-14" /></button>
                                     <button wire:click.stop="mountAction('deleteDeparture', { id: {{ $dep->id }} })" class="wp-icon-btn is-delete"><x-heroicon-o-trash class="wp-icon-14" /></button>
@@ -337,5 +358,8 @@
         <div class="mt-8">
             {{ $this->table }}
         </div>
+
+      
+
     </div>
 </x-filament-panels::page>

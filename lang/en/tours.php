@@ -1,0 +1,22 @@
+<?php
+return [
+    'live_schedule' => 'Live Schedule',
+    'all_tours' => 'All Tours — Book Any Day',
+    'best_rates' => 'Best Rates',
+    'announcement_fallback' => 'Secure your seat with a tiny online deposit',
+    'no_tours_title' => 'No scheduled tours found.',
+    'no_tours_desc' => 'Please check back later for upcoming departures.',
+    'read_more' => 'Read more...',
+    'seats_left' => 'Seats Left',
+    'all_departures' => 'All Scheduled Departures',
+    'no_departures' => 'No active departures',
+    'more' => 'more',
+    'shared_microbus' => 'Shared Microbus',
+    'private_car' => 'Private Car',
+    'pax' => 'Pax',
+    'book' => 'Book',
+    'bottom_banner_title' => 'Secure your private or shared ride with an easy online deposit',
+    'bottom_banner_desc' => 'Pay the remaining cash balance safely on board with the driver.',
+    'full_stay' => 'Full Stay',
+    'off' => 'OFF',
+];

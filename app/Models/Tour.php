@@ -4,15 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tour extends Model
 {
-    use Sluggable;
+    use Sluggable, SoftDeletes;
 
     protected $fillable = [
-        'slug', 'name_en', 'name_ar', 'image_url',
+        'slug', 'name_en', 'name_ar', 'name_ru', 'image_url',
         'location', 'tag_name', 'tag_color_class',
-        'description_en', 'description_ar', 'is_active',
+        'description_en', 'description_ar', 'description_ru', 'is_active',
     ];
 
     

@@ -19,7 +19,7 @@ class ListAreas extends ListRecords
         $settings->update(['hide_coverage_area' => $newState]);
 
         Notification::make()
-            ->title($newState ? 'Coverage section hidden' : 'Coverage section visible')
+            ->title($newState ? __('admin.notifications.coverage_hidden') : __('admin.notifications.coverage_visible'))
             ->success()
             ->send();
     }
@@ -32,13 +32,13 @@ class ListAreas extends ListRecords
 
         return [
             Actions\Action::make('toggleCoverage')
-                ->label($isHidden ? 'Show Coverage Section' : 'Hide Coverage Section')
+                ->label(fn() => $isHidden ? __('admin.actions.show_coverage') : __('admin.actions.hide_coverage'))
                 ->icon($isHidden ? 'heroicon-o-eye' : 'heroicon-o-eye-slash')
                 ->color($isHidden ? 'success' : 'gray')
                 ->action('toggleCoverageVisibility'),
 
             Actions\CreateAction::make()
-                ->label('Add Area')
+                ->label(fn() => __('admin.actions.add_area'))
                 ->icon('heroicon-o-plus'),
         ];
     }

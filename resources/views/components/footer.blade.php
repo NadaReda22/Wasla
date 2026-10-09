@@ -2,8 +2,8 @@
     $brandName = $settings?->brand_name ?? 'Wasla';
     $brandSlogan = $settings?->brand_slogan ?? 'Connected Journeys';
     $logo = $settings?->brand_logo ? \Illuminate\Support\Facades\Storage::url($settings->brand_logo) : asset('images/logo.png');
-    $contactEmail = $settings?->contact_email ?? 'info@sharmtransit.com';
-    $contactPhone = $settings?->contact_phone ?? '+20 100 000 0000';
+    $contactEmail = $settings?->contact_email ?? 'sharmlink39@gmail.com';
+    $contactPhone = $settings?->contact_phone ?? '+20 103834439';
 @endphp
 
 <footer class="gradient-navy text-white pt-16 pb-8 mt-auto">
@@ -13,10 +13,9 @@
                 <div class="flex items-center gap-3 mb-4">
                     <!-- BRAND LOGO & TEXT -->
                     <a href="{{ url('/') }}" class="flex items-center group">
-                        
+
                         <!-- Logo Container -->
                         <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                            <!-- Scale 2.2 blows up the image to hide the transparent borders. Origin-center keeps it balanced. -->
                             <img src="{{ $logo }}" alt="{{ $brandName }} logo" class="w-full h-full object-contain scale-[2.3] group-hover:scale-[2.3] transition-transform origin-center">
                         </div>
                         <div>
@@ -26,26 +25,24 @@
                     </a>
                 </div>
                 <p class="text-white/70 leading-relaxed max-w-md">
-                    The first tourist transport platform in Sharm El Sheikh. We provide comfortable,
-                    air-conditioned buses at affordable prices. Book your seat in minutes and enjoy a
-                    safe, comfortable journey.
+                    {{ __('footer.tagline') }}
                 </p>
             </div>
 
             <div>
-                <h4 class="font-bold text-gold mb-4">Quick Links</h4>
+                <h4 class="font-bold text-gold mb-4">{{ __('footer.quick_links') }}</h4>
                 <ul class="space-y-2">
-                    <li><a href="{{ url('/') }}" class="text-white/70 hover:text-gold transition-colors">Home</a></li>
-                    <li><a href="{{ url('/book') }}" class="text-white/70 hover:text-gold transition-colors">Book a Trip</a></li>
-                    <li><a href="{{ url('/#about') }}" class="text-white/70 hover:text-gold transition-colors">About Us</a></li>
-                    <li><a href="{{ url('/instructions') }}" class="text-white/70 hover:text-gold transition-colors">Instructions</a></li>
-                    <li><a href="{{ url('/faq') }}" class="text-white/70 hover:text-gold transition-colors">FAQ</a></li>
-                    <li><a href="{{ url('/#policies') }}" class="text-white/70 hover:text-gold transition-colors">Policies</a></li>
+                    <li><a href="{{ url('/') }}" class="text-white/70 hover:text-gold transition-colors">{{ __('footer.home') }}</a></li>
+                    <li><a href="{{ url('/book') }}" class="text-white/70 hover:text-gold transition-colors">{{ __('footer.book_a_trip') }}</a></li>
+                    <li><a href="{{ url('/#about') }}" class="text-white/70 hover:text-gold transition-colors">{{ __('footer.about_us') }}</a></li>
+                    <li><a href="{{ url('/instructions') }}" class="text-white/70 hover:text-gold transition-colors">{{ __('footer.instructions') }}</a></li>
+                    <li><a href="{{ url('/faq') }}" class="text-white/70 hover:text-gold transition-colors">{{ __('footer.faq') }}</a></li>
+                    <li><a href="{{ url('/#policies') }}" class="text-white/70 hover:text-gold transition-colors">{{ __('footer.policies') }}</a></li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="font-bold text-gold mb-4">Contact Us</h4>
+                <h4 class="font-bold text-gold mb-4">{{ __('footer.contact_us') }}</h4>
                 <ul class="space-y-3">
                     <li class="flex items-center gap-2 text-white/70">
                         <svg class="w-5 h-5 text-turquoise flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -63,7 +60,7 @@
                         <svg class="w-5 h-5 text-turquoise flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
                         </svg>
-                        Sharm El Sheikh, Egypt
+                        {{ __('footer.location') }}
                     </li>
                 </ul>
             </div>
@@ -71,14 +68,14 @@
         <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="space-y-1 text-center md:text-left">
                 <p class="text-white/50 text-sm">
-                    © {{ date('Y') }} {{ $brandName }}. All rights reserved.
+                    {{ __('footer.rights_reserved', ['year' => date('Y'), 'brand' => $brandName]) }}
                 </p>
                 <p class="text-white/40 text-xs">
-                    Designed & Developed With ❤️ by <span class="text-gold font-semibold">Nada Reda 💻 </span>
+                    {!! __('footer.developed_by', ['name' => '<span class="text-gold font-semibold">Nada Reda 💻</span>']) !!}
                 </p>
             </div>
             <div class="flex items-center gap-4">
-                <span class="badge-gold text-xs">The First Tourist Transport For Connecting Journeys In Sharm El Sheikh</span>
+                <span class="badge-gold text-xs">{{ __('footer.footer_badge') }}</span>
             </div>
         </div>
     </div>
