@@ -383,6 +383,7 @@ class ListTours extends ListRecords
     {
         return Action::make('deletePricingOffer')
             ->requiresConfirmation()
+            ->modalHeading(fn () => __('admin.actions.delete_pricing_offer'))
             ->color('danger')
             ->action(function (array $arguments) {
                 $tier = TourPricingTier::find($arguments['id']);
@@ -487,6 +488,7 @@ class ListTours extends ListRecords
     {
         return Action::make('deleteDeparture')
             ->requiresConfirmation()
+            ->modalHeading(fn () => __('admin.actions.delete_departure'))
             ->color('danger')
             ->action(function (array $arguments) {
                 $originalDep = TourDeparture::find($arguments['id']);
@@ -582,8 +584,7 @@ class ListTours extends ListRecords
                 
             Forms\Components\CheckboxList::make('tours')
                 ->label(fn () => __('admin.fields.assign_departures_tours'))
-                // INSTANT CRASH FIX: Removed the failing dynamic translation check. 
-                // Now uses a safe, fast database query that cannot throw a 500 error.
+               
                 ->options(fn () => Tour::where('is_active', true)->pluck('name_en', 'id')->toArray())
                 ->searchable()
                 ->bulkToggleable()

@@ -8,15 +8,15 @@ return [
         'random' => 'Random', 'random_color' => 'Random Color',
     ],
     'areas_map' => ['zone_popup' => ':name Zone'],
-        'groups' => [
-            'zones_and_pricing' => 'Zones & Pricing',
-            'tours_management' => 'Tours Management',
-            'operations' => 'Operations',
-            'finance' => 'Finance',
-            'settings' => 'Settings',
-            'content' => 'Content',
-            'communication' => 'Communication',
-        ],
+    'groups' => [
+        'zones_and_pricing' => 'Zones & Pricing',
+        'tours_management' => 'Tours Management',
+        'operations' => 'Operations',
+        'finance' => 'Finance',
+        'settings' => 'Settings',
+        'content' => 'Content',
+        'communication' => 'Communication',
+    ],
     
     'nav' => [
         'dashboard' => 'Dashboard',
@@ -119,6 +119,7 @@ return [
         'distribution_status' => 'Distribution Status',
         'price_type' => 'Price Type',
         'date' => 'Date',
+        'ensured' => 'Ensured',
     ],
 
     'fields' => [
@@ -192,7 +193,6 @@ return [
         'latitude_example' => 'e.g., 27.9158',
         'longitude_example' => 'e.g., 34.3298',
         'color_help' => 'Leave empty for a random color.',
-
     ],
 
     'filters' => [
@@ -234,6 +234,8 @@ return [
         'delete' => 'Delete',
         'mark_cash_paid' => 'Mark Selected as Paid',
         'mark_cash_unpaid' => 'Mark Selected as Unpaid',
+        'delete_pricing_offer' => 'Delete Pricing Configuration',
+         'delete_departure' => 'Delete Departure Time'
     ],
 
     'tabs' => [
@@ -269,6 +271,10 @@ return [
         'slot_capacity' => 'Slot Capacity',
         'no_active_vehicles' => 'No active vehicles registered.',
         'no_unassigned_bookings' => 'No unassigned bookings found for this filter.',
+        'no_bookings' => 'No unassigned bookings found for this filter.',
+        'click_to_zoom' => 'Click to zoom on map',
+        'all_locked' => 'All Locked',
+        'locked' => 'Locked',
     ],
 
     'dashboard' => [
@@ -284,6 +290,23 @@ return [
         'weekly_bookings' => 'Weekly Bookings & Revenue',
         'revenue' => 'Revenue',
         'payment_split' => 'Payment Method Split',
+        'total_profits_all_time' => 'Total Profits (All Time)',
+        'total_gross_revenue' => 'Total gross revenue',
+        'sales_generated_today' => 'Sales generated today',
+        'collectable' => 'Collectable',
+        'requires_driver_collection' => 'Requires driver collection',
+        'successful_reservations' => 'Successful reservations',
+        'unique_customers' => 'Unique registered customers',
+        'avg_seats_per_day' => 'Average Seats / Day',
+        'across_operational_days' => 'Across all active operational days',
+        'sales_performance' => 'Sales Performance',
+        'last_7_days' => 'Last 7 Days',
+        'bookings_count' => 'Bookings Count',
+        'revenue_usd' => 'Revenue ($)',
+        'top_performing_tours' => 'Top Performing Tours',
+        'by_total_booking_count' => 'By total booking count',
+        'no_tour_data' => 'No tour data yet.',
+        'sharm_el_sheikh' => 'Sharm El-Sheikh',
     ],
 
     'notifications' => [
@@ -316,6 +339,7 @@ return [
         'bookings_assigned_body' => 'Assigned :direction leg to :plate',
         'bookings_unassigned' => 'Bookings Unassigned',
         'bookings_unassigned_body' => 'Removed :count booking(s) from vehicle :direction leg.',
+        'capacity_exceeded_slot_body' => 'Capacity exceeded for the :time trip! It already has :existing seats, you need :needed more (max :max).',
     ],
 
     'options' => [
@@ -344,6 +368,7 @@ return [
         'all_zones' => 'All Zones',
         'na' => 'N/A',
         'unknown' => 'Unknown',
+        'unassigned' => 'Unassigned',
     ],
     
     'list_tours' => [
@@ -361,7 +386,6 @@ return [
         'out' => 'Out:',
         'no_faqs' => 'No FAQs yet. Click "Add FAQ" to create one.',
         'no_areas' => 'No areas with coordinates set.',
-
     ],
 
     'topbar' => [
@@ -445,32 +469,168 @@ return [
 
         'cannot_switch_live' => 'Cannot switch to Live mode',
         'fill_live_credentials' => 'Fill in the Live Merchant ID, API Key and Webhook Secret first.',
-        'type' => 'Type',
         'policy_key' => 'Section Key',
-        
     ],
 
-    //opeartions dashboard
-    'dashboard' => [
-    'total_profits_all_time' => 'Total Profits (All Time)',
-    'total_gross_revenue' => 'Total gross revenue',
-    'sales_generated_today' => 'Sales generated today',
-    'collectable' => 'Collectable',
-    'requires_driver_collection' => 'Requires driver collection',
-    'successful_reservations' => 'Successful reservations',
-    'unique_customers' => 'Unique registered customers',
-    'avg_seats_per_day' => 'Average Seats / Day',
-    'across_operational_days' => 'Across all active operational days',
-    'sales_performance' => 'Sales Performance',
-    'last_7_days' => 'Last 7 Days',
-    'bookings_count' => 'Bookings Count',
-    'revenue_usd' => 'Revenue ($)',
-    'top_performing_tours' => 'Top Performing Tours',
-    'by_total_booking_count' => 'By total booking count',
-    'no_tour_data' => 'No tour data yet.',
-    'sharm_el_sheikh' => 'Sharm El-Sheikh',
-     'todays_revenue' => ' Today\'s Revenue',
-    'pending_cash' => 'Pending Cash',
+    'booking' => [
+        'client_details' => 'Client Full Details',
+        'full_name' => 'Full Name',
+        'whatsapp_number' => 'WhatsApp Number',
+        'email_address' => 'Email Address',
+        'no_email' => 'No Email',
+        'client_search' => 'Client (Search by Phone)',
+        'tour' => 'Tour',
+        'tour_date' => 'Tour Date',
+        'specific_tour_date' => 'Specific Tour Date',
+        'vehicle_for_pricing' => 'Vehicle (For Pricing)',
+        'seats_count' => 'Seats Count',
+        'hotel_location' => 'Hotel/Location',
+        'room_number' => 'Room Number',
+        'reception_number' => 'Reception Number',
+        'pickup_address' => 'Pickup Address',
+        'google_maps_location' => 'Google Maps Location',
+        'open_in_maps' => 'Open Location on Google Maps',
+        'no_map_coordinates' => 'No map coordinates provided.',
+        'no_zone' => 'No Zone',
+        'deposit_paid' => 'Deposit Paid',
+        'cash_due_on_board' => 'Cash Due on Board',
+        'payment' => 'Payment',
+        'payment_status' => 'Payment Status',
+        'whatsapp_status' => 'WhatsApp Status',
+        'distribution_ensured' => 'Distribution Ensured',
+        'ensured_locked' => 'Ensured (Locked)',
+        'not_ensured' => 'Not Ensured (Unlocked)',
+        'message_driver' => 'Message Driver',
+        'open_whatsapp' => 'Open WhatsApp',
+        'leg_ensured' => 'Ensured',
+        'leg_waiting' => 'Waiting',
+     
+        'payment_statuses' => [
+            'pending' => 'Pending',
+            'paid' => 'Paid',
+            'failed' => 'Failed',
+        ],
+     
+        'whatsapp_statuses' => [
+            'pending' => 'Pending',
+            'sent' => 'Sent',
+            'failed' => 'Failed',
+        ],
+     
+        'notifications' => [
+            'action_forbidden' => 'Action Forbidden',
+            'manifest_filters_required' => 'You must apply both a "Specific Tour Date" and a "Driver" filter before sending the daily manifest.',
+            'missing_driver_title' => 'Missing Driver Data',
+            'missing_driver_body' => 'No driver phone or invalid driver selected.',
+            'no_valid_title' => 'No Valid Bookings',
+            'no_valid_body' => 'This driver has no paid AND ensured bookings for this date.',
+            'manifest_ready' => 'Manifest ready',
+            'locked_title' => 'Some bookings are locked',
+            'locked_body' => 'Unlock the locked bookings before deleting them.',
+        ],
+    ],
 
+    'fleet' => [
+    'ensure_notify_all' => 'Ensure & Notify All',
+    'confirm_heading' => 'Lock & Notify All Assigned Bookings',
+    'confirm_body' => 'This will lock every assigned direction (outbound / return) for the selected date and queue a WhatsApp confirmation for each client. A locked direction can no longer be edited, reassigned or removed.',
+    'confirm_submit' => 'Yes, lock & notify',
+    'ensure_notify_vehicle' => 'Ensure & Notify',
+    'vehicle_modal_heading' => 'Lock & Notify Bookings for :plate',
+    'this_vehicle' => 'this Vehicle',
+    'vehicle_modal_body' => 'This will lock every assigned, unlocked direction for this vehicle on the selected date and queue a WhatsApp confirmation for each client.',
+    'check_whatsapp_status' => 'Check WhatsApp Status',
+ 
+    'cannot_reassign_locked' => 'You cannot reassign a direction that has already been ensured and locked.',
+    'cannot_unassign_locked' => 'You cannot unassign a direction that has already been ensured and locked.',
+    'leg_locked_hint' => 'This direction is already locked and notified.',
+    'unpaid_selected_title' => 'Unpaid bookings selected',
+    'unpaid_selected_body' => 'Only bookings with payment status "paid" can be distributed.',
+ 
+    'select_date_first' => 'Please select a date first.',
+    'tbd' => 'TBD',
+    'unreachable' => 'unreachable',
+    'vehicle_not_found' => 'Vehicle not found',
+ 
+    'whatsapp_not_set_up_title' => 'WhatsApp not set up',
+    'whatsapp_not_set_up_body' => 'Enable and configure WhatsApp from Settings → Integrations. Bookings will NOT be locked until then.',
+    'whatsapp_not_connected_title' => 'WhatsApp not connected',
+    'whatsapp_not_connected_body' => 'The Green API instance is not authorized. Bookings will NOT be locked until this is fixed — use "Check WhatsApp Status" for details.',
+    'whatsapp_disabled_title' => 'WhatsApp integration is disabled',
+    'whatsapp_disabled_body' => 'Enable it from Settings → Integrations.',
+    'green_not_configured_title' => 'Green API not configured',
+    'green_not_configured_body' => 'Host, Instance ID or Token is missing. Set them from Settings → Integrations.',
+ 
+    'state_authorized_title' => 'WhatsApp connected',
+    'state_authorized_body' => 'The instance is authorized and ready to send.',
+    'state_not_authorized_title' => 'WhatsApp not linked',
+    'state_not_authorized_body' => 'Scan the QR code in the Green API console to reconnect.',
+    'state_blocked_title' => 'Instance blocked',
+    'state_blocked_body' => 'This Green API instance has been blocked. Check your console.',
+    'state_unknown_title' => 'Could not verify status',
+    'state_unknown_body' => 'State: :state. Check the Laravel log for details.',
+ 
+    'no_pending_title' => 'No pending bookings',
+    'no_pending_body' => 'No assigned, unlocked, paid directions match the current filters for this date.',
+    'filtered_to' => ' (filtered to :type)',
+    'ensured_title' => 'Distribution Ensured',
+    'ensured_body' => 'Locked :count bookings:note and queued :queued WhatsApp messages for delivery.',
+    'nothing_to_notify_title' => 'Nothing to notify',
+    'nothing_to_notify_body' => 'No unlocked, paid directions are assigned to :plate for this date.',
+    'vehicle_ensured_title' => 'Vehicle Distribution Ensured',
+    'vehicle_ensured_body' => 'Locked :count booking(s) for :plate and queued :queued WhatsApp message(s) for delivery.',
+    'all_locked_notified' => 'All bookings for this vehicle are already locked & notified',
 ],
+
+'vehicle' => [
+    'placeholder_plate' => 'e.g. ABC 1234',
+    'placeholder_driver_name' => 'e.g. Ahmed Ali',
+    'placeholder_driver_phone' => 'e.g. 201000000000',
+    'delete_blocked_title' => 'Cannot delete vehicle',
+    'delete_blocked_body' => 'This vehicle is linked to existing bookings. Deactivate it instead (turn off "Active Status") so booking history stays intact.',
+],
+// ============================================================
+// ============================================================
+'client' => [
+    'nationality_help' => 'رمز الدولة من حرفين (مثال: EG، GB، RU)',
+    'delete_blocked_title' => 'لا يمكن حذف العميل',
+    'delete_blocked_body' => 'لدى هذا العميل حجوزات موجودة. احذف تلك الحجوزات أو انقلها أولاً للحفاظ على سجل الحجوزات.',
+    'booking_references' => 'أرقام الحجوزات المرجعية',
+    'no_bookings' => 'لا توجد حجوزات بعد',
+],
+
+'payments' => [
+    'transaction_details' => 'Transaction Details',
+    'booking_client_info' => 'Booking & Client Information',
+    'order_id' => 'Order ID',
+    'amount' => 'Amount',
+    'currency' => 'Currency',
+    'status' => 'Status',
+    'booking_ref' => 'Booking Ref',
+    'client_id' => 'Client ID',
+    'client_name' => 'Client Name',
+    'whatsapp' => 'WhatsApp',
+    'email' => 'Email',
+    'nationality' => 'Nationality',
+    'tour' => 'Tour',
+    'tour_date' => 'Tour Date',
+    'passengers' => 'Passengers',
+    'pickup' => 'Hotel / Pickup',
+    'room' => 'Room',
+    'reception' => 'Reception',
+    'date' => 'Date',
+    'tabs' => [
+        'all' => 'All Transactions',
+        'paid' => 'Paid',
+        'pending' => 'Pending',
+        'failed' => 'Failed',
+    ],
+    'statuses' => [
+        'paid' => 'Paid',
+        'pending' => 'Pending',
+        'failed' => 'Failed',
+    ],
+],
+
+
 ];

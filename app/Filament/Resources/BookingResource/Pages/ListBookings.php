@@ -15,11 +15,9 @@ class ListBookings extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // Added the "New Booking" button here
             Actions\CreateAction::make(),
-            
             Actions\Action::make('distribution')
-                ->label(fn () => __('admin.actions.fleet_distribution') ?? 'Fleet Distribution')
+                ->label(fn () => __('admin.actions.fleet_distribution'))
                 ->icon('heroicon-s-map')
                 ->color('warning')
                 ->url(fn () => static::getResource()::getUrl('distribution')),
@@ -29,25 +27,13 @@ class ListBookings extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(fn () => __('admin.tabs.all_bookings') ?? 'All Bookings')
-                ->icon('heroicon-m-queue-list'),
-                
-            'unassigned' => Tab::make(fn () => __('admin.tabs.needs_assignment') ?? 'Needs Assignment')
+            'all' => Tab::make(__('admin.tabs.all_bookings'))->icon('heroicon-m-queue-list'),
+            'unassigned' => Tab::make(__('admin.tabs.needs_assignment'))
                 ->icon('heroicon-m-exclamation-triangle')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where(function ($q) {
-                    $q->whereNull('outbound_vehicle_id')
-                      ->orWhere(function ($sub) {
-                          $sub->where('trip_type', 'round_trip')->whereNull('return_vehicle_id');
-                      });
-                })),
-                
-            'assigned' => Tab::make(fn () => __('admin.tabs.fully_assigned') ?? 'Fully Assigned')
+                ->modifyQueryUsing(fn (Builder $query) => $query->unassigned()),
+            'assigned' => Tab::make(__('admin.tabs.fully_assigned'))
                 ->icon('heroicon-m-check-badge')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('outbound_vehicle_id')
-                      ->where(function ($q) {
-                          $q->where('trip_type', 'one_way')
-                            ->orWhereNotNull('return_vehicle_id');
-                      })),
+                ->modifyQueryUsing(fn (Builder $query) => $query->fullyAssigned()),
         ];
     }
 }

@@ -28,9 +28,9 @@ class AppServiceProvider extends ServiceProvider
             View::share('settings', $settings);
         }
 
-        // 2.this to force secure asset links over ngrok
-       // Force HTTPS if accessed via ngrok or production
-        if (str_contains(request()->getHost(), 'ngrok') || app()->environment('production')) {
+        // Force HTTPS if accessed via ngrok, cloudflare tunnels, or production
+        $host = request()->getHost();
+        if (str_contains($host, 'ngrok') || str_contains($host, 'trycloudflare.com') || app()->environment('production')) {
             URL::forceScheme('https');
         }
     }

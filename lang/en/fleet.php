@@ -12,7 +12,6 @@ return [
     'feature_ac_title' => 'Full A/C',
     'feature_ac_desc' => 'Arctic-cold air conditioning in every vehicle',
     
-    // REPLACED USB WITH ON-TIME PICKUPS
     'feature_time_title' => 'On-Time Pickups',
     'feature_time_desc' => 'Reliable and punctual schedules so you never miss a tour',
     

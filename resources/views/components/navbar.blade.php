@@ -9,7 +9,6 @@
         ['to' => url('/#about'), 'label' => __('nav.about_us')],
         ['to' => url('/instructions'), 'label' => __('nav.instructions')],
         ['to' => url('/faq'), 'label' => __('nav.faq')],
-        ['to' => url('/#coverage'), 'label' => __('nav.coverage_area')],
     ];
 
       if (!($settings?->hide_coverage_area)) {

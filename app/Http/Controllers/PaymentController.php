@@ -84,7 +84,6 @@ class PaymentController extends Controller
             $booking = $payment->booking;
 
             if ($status === 'SUCCESS') {
-                // FIXED: Added the minus sign that was missing here
                 $amountMismatch = abs($paidAmount - (float) $payment->amount) > 0.01;
                 $currencyMismatch = $paidCurrency && strtoupper($paidCurrency) !== strtoupper($payment->currency);
 

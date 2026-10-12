@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class BookingController extends Controller
 {
@@ -144,7 +145,10 @@ class BookingController extends Controller
             ];
         });
 
-        return view('pages.booking', compact('routes', 'areas', 'limits'));
+        // Nationality list: ISO codes + names from config/countries.php
+        $countries = config('countries');
+
+        return view('pages.booking', compact('routes', 'areas', 'limits', 'countries'));
     }
 
     public function store(Request $request, KashierPaymentService $kashierService)
@@ -156,8 +160,8 @@ class BookingController extends Controller
             'passengers'      => 'required|integer|min:1',
             'leadName'        => 'required|string|max:255',
             'email'           => 'nullable|email|max:255',
-            'whatsapp'        => 'required|string|max:50',
-            'nationality'     => 'required|string|size:2',
+            'whatsapp'        => ['required', 'string', 'max:50', 'regex:/^\+?[0-9\s\-().]{6,}$/'],
+            'nationality'     => ['required', 'string', Rule::in(array_keys(config('countries')))],
             'roomNumber'      => 'required|string|max:50', 
             'receptionNumber' => 'required|string|max:50', 
             'hotel'           => 'required|string',
@@ -172,29 +176,13 @@ class BookingController extends Controller
 
         [$booking, $payment, $depositDue] = DB::transaction(function () use ($validated) {
 
-            $email = $validated['email'] ?? null;
-            $whatsapp = $validated['whatsapp'];
-
-            $client = Client::where('whatsapp_number', $whatsapp)
-                ->when($email, function ($query) use ($email) {
-                    $query->orWhere('email', $email);
-                })->first();
-
-            if ($client) {
-                $client->update([
-                    'whatsapp_number' => $whatsapp,
-                    'email'           => $email,
-                    'full_name'       => $validated['leadName'],
-                    'nationality'     => $validated['nationality'],
-                ]);
-            } else {
-                $client = Client::create([
-                    'whatsapp_number' => $whatsapp,
-                    'email'           => $email,
-                    'full_name'       => $validated['leadName'],
-                    'nationality'     => $validated['nationality'],
-                ]);
-            }
+            // Same phone or same email = same client: the existing row is overwritten .
+            $client = Client::upsertByContact([
+                'whatsapp_number' => $validated['whatsapp'],
+                'email'           => $validated['email'] ?? null,
+                'full_name'       => $validated['leadName'],
+                'nationality'     => $validated['nationality'],
+            ]);
 
             $tour = Tour::where('slug', $validated['routeId'])->orWhere('id', $validated['routeId'])->first();
             if (!$tour) {

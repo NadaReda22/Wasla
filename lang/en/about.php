@@ -14,7 +14,6 @@ return [
         ],
         'who_we_are' => [
             'title' => 'Who We Are',
-            // Removed bilingual guides
             'text' => 'A dedicated team of licensed professional drivers and logistics experts.',
         ],
         'growth' => [

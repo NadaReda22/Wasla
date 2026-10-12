@@ -1,14 +1,18 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\TourPricingTier;
 use Filament\Notifications\Notification;
 
-class BookingPricingService
+class PricingCalculatorService
 {
-    public function calculatePricing(?int $tourId, ?string $tripType, ?string $vehicleType, int $pax): array
+    /**
+     * @return array{tier_id: ?int, total_price: float|int, deposit_amount: float|int}
+     */
+    public function calculate(?int $tourId, ?string $tripType, ?string $vehicleType, int $pax): array
     {
-        if (!$tourId || !$tripType || !$vehicleType || $pax < 1) {
+        if (! $tourId || ! $tripType || ! $vehicleType || $pax < 1) {
             return $this->emptyState();
         }
 
@@ -22,7 +26,7 @@ class BookingPricingService
         $baseTier = $tiers->where('is_base', true)->first();
         $offers = $tiers->where('is_base', false);
 
-        if (!$baseTier && $offers->isEmpty()) {
+        if (! $baseTier && $offers->isEmpty()) {
             Notification::make()->warning()->title('No pricing configured for these options.')->send();
             return $this->emptyState();
         }
@@ -34,21 +38,27 @@ class BookingPricingService
 
         if ($vehicleType === 'private') {
             $carTier = $offers->first() ?? $baseTier;
-            $capacity = $carTier->pax_count > 0 ? $carTier->pax_count : 4; 
+            $capacity = $carTier->pax_count > 0 ? $carTier->pax_count : 4;
             $carsNeeded = (int) ceil($remainingPax / $capacity);
-            
+
             $totalPrice = $carsNeeded * $carTier->total_price;
             $depositDue = $carsNeeded * $carTier->deposit_amount;
             $primaryTierId = $carTier->id;
         } else {
             foreach ($offers as $offer) {
-                if ($remainingPax <= 0) break;
-                if ($offer->pax_count <= 0) continue;
+                if ($remainingPax <= 0) {
+                    break;
+                }
+                if ($offer->pax_count <= 0) {
+                    continue;
+                }
 
                 $multiplier = (int) floor($remainingPax / $offer->pax_count);
-                if ($multiplier <= 0) continue;
+                if ($multiplier <= 0) {
+                    continue;
+                }
 
-                if (!$primaryTierId) $primaryTierId = $offer->id;
+                $primaryTierId ??= $offer->id;
 
                 $totalPrice += $offer->total_price * $multiplier;
                 $depositDue += $offer->deposit_amount * $multiplier;
@@ -56,27 +66,25 @@ class BookingPricingService
             }
 
             if ($remainingPax > 0 && $baseTier) {
-                if (!$primaryTierId) $primaryTierId = $baseTier->id;
+                $primaryTierId ??= $baseTier->id;
                 $totalPrice += $remainingPax * $baseTier->total_price;
                 $depositDue += $remainingPax * $baseTier->deposit_amount;
             }
         }
 
         return [
-            'tour_pricing_tier_id' => $primaryTierId,
+            'tier_id' => $primaryTierId,
             'total_price' => $totalPrice,
-            'deposit_paid' => $depositDue,
-            'cash_due_on_board' => max(0, $totalPrice - $depositDue),
+            'deposit_amount' => $depositDue,
         ];
     }
 
     private function emptyState(): array
     {
         return [
-            'tour_pricing_tier_id' => null,
+            'tier_id' => null,
             'total_price' => 0,
-            'deposit_paid' => 0,
-            'cash_due_on_board' => 0,
+            'deposit_amount' => 0,
         ];
     }
 }

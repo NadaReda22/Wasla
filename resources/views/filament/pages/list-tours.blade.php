@@ -264,10 +264,10 @@
                                     {{ $tier->is_active ? (__('admin.list_tours.active') ?? 'Active') : (__('admin.list_tours.paused') ?? 'Paused') }}
                                 </button>
                                 <div style="display:flex; align-items:center; gap:4px;">
-                                    <button wire:click.stop="mountAction('editPricingOffer', { id: {{ $tier->id }} })" aria-label="Edit" class="wp-icon-btn">
+                                    <button wire:click.stop="mountAction('editPricingOffer', { id: {{ $tier->id }} })"  aria-label="{{ __('admin.actions.edit') }}" class="wp-icon-btn">
                                         <x-heroicon-o-pencil-square class="wp-icon-14" />
                                     </button>
-                                    <button wire:click.stop="mountAction('deletePricingOffer', { id: {{ $tier->id }} })" aria-label="Delete" class="wp-icon-btn is-delete">
+                                    <button wire:click.stop="mountAction('deletePricingOffer', { id: {{ $tier->id }} })"   aria-label="{{ __('admin.actions.delete') }}" class="wp-icon-btn is-delete">
                                         <x-heroicon-o-trash class="wp-icon-14" />
                                     </button>
                                 </div>

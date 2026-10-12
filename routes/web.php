@@ -5,6 +5,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\DriverManifestController;
+
 
 
 
@@ -37,11 +39,18 @@ Route::get('/book/active-hotels', [BookingController::class, 'getActiveHotels'])
 // Redirect target for tourists after paying on Kashier
 Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 
-// Server-to-server webhook notification (requires CSRF exemption if kept here)
+// Server-to-server webhook notification 
 Route::post('/payment/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
 
 // =========================================================
-// 4. Translation
+// 5. Show Driver Manifest Page
+// =========================================================
+Route::get('/manifest/{vehicle}/{date}', [DriverManifestController::class, 'show'])
+    ->name('driver.manifest')
+    ->middleware('signed');
+
+// =========================================================
+// 6. Translation
 // =========================================================
 Route::get('/lang/{locale}', function (string $locale) {
     if (in_array($locale, ['en', 'ru'])) {
@@ -58,3 +67,5 @@ Route::get('/admin/lang/{locale}', function ($locale) {
     }
     return redirect()->back();
 })->name('admin.lang.switch');
+
+

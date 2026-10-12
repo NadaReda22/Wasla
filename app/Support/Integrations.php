@@ -8,14 +8,15 @@ use App\Models\Setting;
  * Single place the rest of the app asks "what are the Kashier / WhatsApp credentials?".
  * Reads the encrypted values saved from Filament. In TEST mode it falls back to .env
  * (config/services.php) so local development keeps working without touching the admin.
+ *
+ * NOTE: no static cache on purpose. Queue workers are long-running processes, and a static
+ * cache would keep serving old credentials until the worker is restarted.
  */
 class Integrations
 {
-    private static ?Setting $settings = null;
-
     private static function settings(): ?Setting
     {
-        return self::$settings ??= Setting::first();
+        return Setting::first();
     }
 
     public static function kashier(): array
@@ -36,7 +37,6 @@ class Integrations
 
         $data = [
             'mode'           => $mode,
-            // Confirm both URLs against Kashier's docs / onboarding email.
             'base_url'       => $mode === 'live' ? 'https://api.kashier.io' : 'https://test-api.kashier.io',
             'merchant_id'    => $get('merchant_id'),
             'api_key'        => $get('api_key'),

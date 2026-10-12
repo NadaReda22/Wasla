@@ -13,33 +13,37 @@ use App\Jobs\SendWhatsAppMessageJob;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Filament\Notifications\Notification;
-use Filament\Actions\Action;                             
-use Filament\Actions\Concerns\InteractsWithActions;       
-use Filament\Actions\Contracts\HasActions;   
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Support\Enums\ActionSize;
 use Illuminate\Database\Eloquent\Collection;
 use App\Services\GreenApiService;
+use App\Services\Messaging\BookingWhatsAppMessage;
 
 class BookingDistribution extends Page implements HasActions
 {
     use InteractsWithActions;
 
+    /** Only bookings with this payment status can be distributed, locked or notified. */
+    private const PAID_STATUS = 'paid';
+
     protected static string $resource = BookingResource::class;
     protected static string $view = 'filament.resources.booking-resource.pages.booking-distribution';
-    
+
     public function getTitle(): string
     {
         return __('admin.actions.fleet_distribution') ?? 'Fleet Distribution';
     }
 
     public $selectedDate;
-    public $selectedTour = ''; 
-    public $selectedDepartureTime = ''; 
-    public $selectedReturnTime = '';    
+    public $selectedTour = '';
+    public $selectedDepartureTime = '';
+    public $selectedReturnTime = '';
     public $selectedAreaId = '';
-    public $direction = 'outbound'; 
-    public $selectedVehicleType = ''; 
-    public $selectedBookingVehicleType = ''; 
+    public $direction = 'outbound';
+    public $selectedVehicleType = '';
+    public $selectedBookingVehicleType = '';
     public $selectedBookings = [];
 
     public function mount()
@@ -61,6 +65,11 @@ class BookingDistribution extends Page implements HasActions
         $this->selectedReturnTime = '';
         $this->selectedAreaId = '';
         $this->selectedBookingVehicleType = '';
+
+        // The tour list depends on the date: drop the selected tour if it has no bookings on the new date.
+        if ($this->selectedTour !== '' && !array_key_exists($this->selectedTour, $this->getAvailableToursProperty())) {
+            $this->selectedTour = '';
+        }
     }
 
     public function updated($propertyName)
@@ -83,9 +92,22 @@ class BookingDistribution extends Page implements HasActions
         return $dates;
     }
 
+    /**
+     * Only the tours that have paid bookings on the selected date.
+     */
     public function getAvailableToursProperty()
     {
-        return Tour::withTrashed()->get()
+        if (!$this->selectedDate) return [];
+
+        $tourIds = Booking::where('booking_date', $this->selectedDate)
+            ->where('payment_status', self::PAID_STATUS)
+            ->whereNotNull('tour_id')
+            ->distinct()
+            ->pluck('tour_id');
+
+        return Tour::withTrashed()
+            ->whereIn('id', $tourIds)
+            ->get()
             ->mapWithKeys(fn($t) => [$t->id => $t->name_ru ? "{$t->name_en} / {$t->name_ru}" : $t->name_en])
             ->toArray();
     }
@@ -93,8 +115,9 @@ class BookingDistribution extends Page implements HasActions
     public function getAvailableDepartureTimesProperty()
     {
         if (!$this->selectedDate) return [];
-        
+
         $query = Booking::where('booking_date', $this->selectedDate)
+            ->where('payment_status', self::PAID_STATUS)
             ->with(['departure' => fn($q) => $q->withTrashed()]);
 
         if ($this->selectedTour) {
@@ -131,6 +154,7 @@ class BookingDistribution extends Page implements HasActions
         if (!$this->selectedDate) return [];
 
         $bookingsQuery = Booking::where('booking_date', $this->selectedDate)
+            ->where('payment_status', self::PAID_STATUS)
             ->where('trip_type', 'round_trip')
             ->with(['departure' => fn($q) => $q->withTrashed()]);
 
@@ -164,6 +188,7 @@ class BookingDistribution extends Page implements HasActions
         if (!$this->selectedDate) return [];
 
         $query = Booking::where('booking_date', $this->selectedDate)
+            ->where('payment_status', self::PAID_STATUS)
             ->whereNotNull('area_id');
 
         if ($this->selectedTour) {
@@ -198,12 +223,13 @@ class BookingDistribution extends Page implements HasActions
         if (!$this->selectedDate) return collect();
 
         $query = Booking::with([
-                'client', 'area', 
-                'tour' => fn($q) => $q->withTrashed(), 
+                'client', 'area',
+                'tour' => fn($q) => $q->withTrashed(),
                 'departure' => fn($q) => $q->withTrashed(),
                 'pricingTier' => fn($q) => $q->withTrashed()
             ])
-            ->where('booking_date', $this->selectedDate);
+            ->where('booking_date', $this->selectedDate)
+            ->where('payment_status', self::PAID_STATUS);
 
         if ($this->selectedTour) {
             $query->where('tour_id', $this->selectedTour);
@@ -244,7 +270,7 @@ class BookingDistribution extends Page implements HasActions
     public function getActiveVehiclesProperty()
     {
         $query = Vehicle::where('is_active', true);
-        
+
         if ($this->selectedVehicleType) {
             $query->where('type', $this->selectedVehicleType);
         }
@@ -255,14 +281,14 @@ class BookingDistribution extends Page implements HasActions
         $selectedTour = $this->selectedTour;
         $direction = $this->direction;
         $targetVehicleCol = $direction === 'outbound' ? 'outbound_vehicle_id' : 'return_vehicle_id';
-        
+
         $filterDepTime = $this->selectedDepartureTime ? Carbon::parse($this->selectedDepartureTime)->format('H:i') : null;
         $filterRetTime = $this->selectedReturnTime ? Carbon::parse($this->selectedReturnTime)->format('H:i') : null;
 
         return $vehicles->map(function ($vehicle) use ($selectedDate, $selectedTour, $direction, $targetVehicleCol, $filterDepTime, $filterRetTime) {
-            
+
             $allTodayBookings = Booking::with([
-                    'area', 
+                    'area',
                     'tour' => fn($q) => $q->withTrashed(),
                     'departure' => fn($q) => $q->withTrashed()
                 ])
@@ -278,10 +304,10 @@ class BookingDistribution extends Page implements HasActions
             $stayingBooking = $allTodayBookings->first(fn($b) => (bool) $b->tour?->is_bus_staying && $b->outbound_vehicle_id === $vehicle->id);
             if ($stayingBooking) {
                 $vehicle->is_tour_staying = true;
-                
+
                 $depRaw = $stayingBooking->departure?->departure_time;
                 $retRaw = $stayingBooking->departure?->return_time;
-                
+
                 $vehicle->staying_time_range = [
                     'out' => $depRaw ? Carbon::parse($depRaw)->format('g:i A') : '09:00 AM',
                     'ret' => $retRaw ? Carbon::parse($retRaw)->format('g:i A') : 'TBD'
@@ -314,7 +340,9 @@ class BookingDistribution extends Page implements HasActions
                     'time' => $depTime,
                     'is_bus_staying' => (bool) $first->tour?->is_bus_staying,
                     'pax' => $tBookings->sum('seats_count'),
-                    'booking_ids' => $tBookings->pluck('id')->toArray(),
+                    'booking_ids' => $tBookings->where('is_outbound_ensured', false)->pluck('id')->values()->toArray(),
+                    'is_locked' => $tBookings->every(fn ($b) => (bool) $b->is_outbound_ensured),
+                    'locked_count' => $tBookings->where('is_outbound_ensured', true)->count(),
                     'zones' => $tBookings->pluck('area.name_en')->filter()->unique()->values()->toArray(),
                 ];
             }
@@ -336,31 +364,30 @@ class BookingDistribution extends Page implements HasActions
                     'time' => $retTime,
                     'is_bus_staying' => (bool) $first->tour?->is_bus_staying,
                     'pax' => $tBookings->sum('seats_count'),
-                    'booking_ids' => $tBookings->pluck('id')->toArray(),
+                    'booking_ids' => $tBookings->where('is_return_ensured', false)->pluck('id')->values()->toArray(),
+                    'is_locked' => $tBookings->every(fn ($b) => (bool) $b->is_return_ensured),
+                    'locked_count' => $tBookings->where('is_return_ensured', true)->count(),
                     'zones' => $tBookings->pluck('area.name_en')->filter()->unique()->values()->toArray(),
                 ];
             }
 
             $vehicle->assignments_list = $assignments;
 
-            $vehicle->pending_ensure_count = Booking::where('booking_date', $selectedDate)
-                ->where('is_distribution_ensured', false)
-                ->whereNotNull('outbound_vehicle_id')
-                ->where(function ($q) {
-                    $q->where('trip_type', 'one_way')
-                      ->orWhereNotNull('return_vehicle_id');
-                })
-                ->where(function ($q) use ($vehicle) {
-                    $q->where('outbound_vehicle_id', $vehicle->id)
-                      ->orWhere('return_vehicle_id', $vehicle->id);
-                })
-                ->count();
+            $paidToday = $allTodayBookings->where('payment_status', self::PAID_STATUS);
+
+            $vehicle->pending_ensure_count =
+                $paidToday->where('outbound_vehicle_id', $vehicle->id)->where('is_outbound_ensured', false)->count()
+                + $paidToday->where('trip_type', 'round_trip')->where('return_vehicle_id', $vehicle->id)->where('is_return_ensured', false)->count();
+
+            $vehicle->locked_count =
+                $allTodayBookings->where('outbound_vehicle_id', $vehicle->id)->where('is_outbound_ensured', true)->count()
+                + $allTodayBookings->where('return_vehicle_id', $vehicle->id)->where('is_return_ensured', true)->count();
 
             $currentDirectionBookings = $allTodayBookings->where($targetVehicleCol, $vehicle->id);
             if ($selectedTour) {
                 $currentDirectionBookings = $currentDirectionBookings->where('tour_id', $selectedTour);
             }
-            
+
             if ($filterDepTime) {
                 $currentDirectionBookings = $currentDirectionBookings->filter(function($b) use ($filterDepTime) {
                     $val = $b->departure?->departure_time;
@@ -375,8 +402,23 @@ class BookingDistribution extends Page implements HasActions
                     return $val && str_contains($val, $filterRetTime);
                 });
             }
-            
-            $vehicle->seats_taken = (int) $currentDirectionBookings->sum('seats_count');
+            // Group by tour and departure time to find the maximum seats taken for this vehicle in the current direction.
+            $groupedByTime = $currentDirectionBookings->groupBy(function($b) use ($direction) {
+                if ($direction === 'outbound') {
+                    return $b->tour_id . '|' . ($b->departure?->departure_time ?? '09:00:00');
+                } else {
+                    return $b->tour_id . '|' . ($b->departure?->return_time ?? '00:00:00');
+                }
+            });
+
+            $maxSeats = 0;
+            foreach ($groupedByTime as $group) {
+                $sum = $group->sum('seats_count');
+                if ($sum > $maxSeats) {
+                    $maxSeats = $sum;
+                }
+            }
+            $vehicle->seats_taken = (int) $maxSeats;
 
             return $vehicle;
         })->values();
@@ -389,15 +431,30 @@ class BookingDistribution extends Page implements HasActions
             return;
         }
 
+        $lockedColumn = $this->direction === 'outbound' ? 'is_outbound_ensured' : 'is_return_ensured';
+
         $ensuredBookings = Booking::whereIn('id', $this->selectedBookings)
-            ->where('is_distribution_ensured', true)
+            ->where($lockedColumn, true)
             ->count();
 
         if ($ensuredBookings > 0) {
             Notification::make()->danger()
-                ->title('Action Forbidden')
-                ->body('You cannot reassign bookings that have already been ensured and locked.')
+                ->title(__('admin.booking.notifications.action_forbidden'))
+                ->body(__('admin.fleet.cannot_reassign_locked'))
                 ->send();
+            return;
+        }
+
+        $unpaid = Booking::whereIn('id', $this->selectedBookings)
+            ->where('payment_status', '!=', self::PAID_STATUS)
+            ->count();
+
+        if ($unpaid > 0) {
+            Notification::make()->danger()
+                ->title(__('admin.fleet.unpaid_selected_title'))
+                ->body(__('admin.fleet.unpaid_selected_body'))
+                ->send();
+            $this->selectedBookings = [];
             return;
         }
 
@@ -407,26 +464,41 @@ class BookingDistribution extends Page implements HasActions
             return;
         }
 
-        $seatsNeeded = Booking::whereIn('id', $this->selectedBookings)->sum('seats_count');
-        $activeVehicles = $this->getActiveVehiclesProperty();
-        $targetVehicle = $activeVehicles->firstWhere('id', $vehicleId);
-        
-        $currentSeatsTaken = $targetVehicle ? $targetVehicle->seats_taken : 0;
-        $remainingSeats = max(0, $vehicle->capacity - $currentSeatsTaken);
-
-        if ($seatsNeeded > $remainingSeats) {
-            Notification::make()->danger()
-                ->title(__('admin.notifications.not_enough_capacity'))
-                ->body(__('admin.notifications.not_enough_capacity_body', [
-                    'needed' => $seatsNeeded,
-                    'plate' => $vehicle->plate_number,
-                    'left' => $remainingSeats
-                ]))
-                ->send();
-            return;
-        }
-
         $columnToUpdate = $this->direction === 'outbound' ? 'outbound_vehicle_id' : 'return_vehicle_id';
+        
+        $selectedBookingsData = Booking::with('departure')->whereIn('id', $this->selectedBookings)->get();
+        
+        $groupedSelected = $selectedBookingsData->groupBy(function($b) {
+             return $b->tour_id . '|' . ($b->tour_departure_id ?? 'default');
+        });
+
+        foreach ($groupedSelected as $groupKey => $newBookings) {
+            $seatsNeededForThisTime = $newBookings->sum('seats_count');
+            $firstBooking = $newBookings->first();
+            
+            $existingSeatsAtThisTime = Booking::where('booking_date', $this->selectedDate)
+                ->where($columnToUpdate, $vehicleId)
+                ->where('tour_id', $firstBooking->tour_id)
+                ->where('tour_departure_id', $firstBooking->tour_departure_id)
+                ->sum('seats_count');
+
+            if (($existingSeatsAtThisTime + $seatsNeededForThisTime) > $vehicle->capacity) {
+                
+                $timeStr = $this->direction === 'outbound' 
+                           ? ($firstBooking->departure?->departure_time ? Carbon::parse($firstBooking->departure->departure_time)->format('g:i A') : '09:00 AM')
+                           : ($firstBooking->departure?->return_time ? Carbon::parse($firstBooking->departure->return_time)->format('g:i A') : 'TBD');
+                           
+                Notification::make()->danger()
+                    ->title(__('admin.notifications.not_enough_capacity'))
+                    ->body(__('admin.notifications.capacity_exceeded_slot_body', [
+                        'time' => $timeStr,
+                        'existing' => $existingSeatsAtThisTime,
+                        'needed' => $seatsNeededForThisTime,
+                        'max' => $vehicle->capacity,
+                    ]))->send();
+                return;
+            }
+        }
 
         DB::transaction(function () use ($columnToUpdate, $vehicleId) {
             Booking::whereIn('id', $this->selectedBookings)->update([
@@ -443,20 +515,22 @@ class BookingDistribution extends Page implements HasActions
                 'plate' => $vehicle->plate_number
             ]))
             ->send();
-            
+
         $this->dispatch('refresh-map');
     }
 
     public function unassignBooking(array $bookingIds, string $direction)
     {
+        $lockedColumn = $direction === 'outbound' ? 'is_outbound_ensured' : 'is_return_ensured';
+
         $ensuredBookings = Booking::whereIn('id', $bookingIds)
-            ->where('is_distribution_ensured', true)
+            ->where($lockedColumn, true)
             ->count();
 
         if ($ensuredBookings > 0) {
             Notification::make()->danger()
-                ->title('Action Forbidden')
-                ->body('You cannot unassign bookings that have already been ensured and locked.')
+                ->title(__('admin.booking.notifications.action_forbidden'))
+                ->body(__('admin.fleet.cannot_unassign_locked'))
                 ->send();
             return;
         }
@@ -480,120 +554,140 @@ class BookingDistribution extends Page implements HasActions
         $this->dispatch('refresh-map');
     }
 
-    // ===============================================
-    // ASYNCHRONOUS WHATSAPP NOTIFICATION QUEUEING
-    // ===============================================
-    private function queueNotificationsForBookings(Collection $bookings): int
+    private function pendingLegsQuery()
     {
-        $queuedCount = 0;
-        $brandName = Setting::first()?->brand_name ?? 'Our Company';
+        return Booking::with(['client', 'tour', 'departure', 'outboundVehicle', 'returnVehicle', 'area'])
+            ->where('booking_date', $this->selectedDate)
+            ->where('payment_status', self::PAID_STATUS)
+            ->where(function ($q) {
+                $q->where(fn ($s) => $s->whereNotNull('outbound_vehicle_id')->where('is_outbound_ensured', false))
+                  ->orWhere(fn ($s) => $s->where('trip_type', 'round_trip')->whereNotNull('return_vehicle_id')->where('is_return_ensured', false));
+            });
+    }
 
-        foreach ($bookings as $record) {
-            $record->update(['is_distribution_ensured' => true]);
+    private function legsToLock(Booking $b, ?int $vehicleId = null): array
+    {
+        $typeOk = fn ($vehicle) => !$this->selectedVehicleType || $vehicle?->type === $this->selectedVehicleType;
+        $legs = [];
 
-            if ($record->client && $record->client->whatsapp_number) {
-                $phone = preg_replace('/[^0-9]/', '', $record->client->whatsapp_number) . '@c.us';
-
-                $pickupTime = $record->departure?->departure_time ? Carbon::parse($record->departure->departure_time)->format('g:i A') : '09:00 AM';
-                $returnTime = $record->departure?->return_time ? Carbon::parse($record->departure->return_time)->format('g:i A') : null;
-                $cleanDate = Carbon::parse($record->booking_date)->format('M d, Y');
-                
-                $timingText = "🕒 *Pickup Time:* {$pickupTime}";
-                if ($record->trip_type === 'round_trip' && $returnTime) {
-                    $timingText .= " | *Return Time:* {$returnTime}";
-                }
-
-                $receptionText = !empty($record->reception_number) ? $record->reception_number : 'Main Lobby / Reception';
-                $tourName = $record->tour?->name_ru ? "{$record->tour->name_en} / {$record->tour->name_ru}" : ($record->tour?->name_en ?? 'Custom Tour');
-                $cash = ($record->cash_due_on_board > 0 && !$record->is_cash_on_board_paid) ? $record->cash_due_on_board : 0;
-                
-                $vehicleSection = "";
-                if ($record->outboundVehicle) {
-                    $vType = $record->outboundVehicle->type === 'private_car' ? 'Private Car' : 'Shared Microbus';
-                    $driverName = $record->outboundVehicle->driver_name ?? 'Assigned Driver';
-                    $driverPhone = $record->outboundVehicle->driver_phone ? " (📱 {$record->outboundVehicle->driver_phone})" : '';
-                    
-                    $vehicleSection .= "🚐 *Outbound Vehicle:* {$vType} ({$record->outboundVehicle->plate_number})\n";
-                    $vehicleSection .= "👤 *Outbound Driver:* {$driverName}{$driverPhone}\n";
-                }
-
-                if ($record->trip_type === 'round_trip') {
-                    if ($record->returnVehicle) {
-                        $retVType = $record->returnVehicle->type === 'private_car' ? 'Private Car' : 'Shared Microbus';
-                        $retDriverName = $record->returnVehicle->driver_name ?? 'Assigned Driver';
-                        $retDriverPhone = $record->returnVehicle->driver_phone ? " (📱 {$record->returnVehicle->driver_phone})" : '';
-                        
-                        $vehicleSection .= "\n🛬 *Return Vehicle:* {$retVType} ({$record->returnVehicle->plate_number})\n";
-                        $vehicleSection .= "👤 *Return Driver:* {$retDriverName}{$retDriverPhone}\n";
-                    } elseif ($record->outboundVehicle && $record->tour?->is_bus_staying) {
-                        $vehicleSection .= "\n🛬 *Return Vehicle:* Same vehicle (stays on-site)\n";
-                    }
-                }
-
-                $message = "Hello {$record->client->full_name}! 👋\n\n";
-                $message .= "Your upcoming adventure with *{$brandName}* is confirmed! Here are your complete details:\n\n";
-                $message .= "🚩 *Tour:* {$tourName}\n";
-                $message .= "📅 *Date:* {$cleanDate}\n";
-                $message .= "{$timingText}\n";
-                $message .= "📍 *Location:* {$record->pickup_name}\n";
-                
-                // Room isolated from meeting point
-                if (!empty($record->room_number)) {
-                    $message .= "🚪 *Room:* {$record->room_number}\n";
-                }
-                
-                $message .= "🤝 *Meet At:* {$receptionText}\n";
-                $message .= "💺 *Passengers:* {$record->seats_count} Pax\n";
-                
-                if (!empty($vehicleSection)) {
-                    $message .= "\n" . trim($vehicleSection) . "\n";
-                }
-
-                if ($cash > 0) {
-                    $message .= "\n💵 *Remaining Balance:* $" . number_format($cash, 2) . " (Please prepare this in cash for the driver)\n";
-                }
-
-                $message .= "\n📌 *Important Instructions:*\n";
-                $message .= "• Please be waiting in the reception or lobby area *10 to 15 minutes* before your scheduled pickup time.\n";
-                $message .= "• Kindly note that the vehicle might arrive slightly late due to traffic or previous hotel pickups. Your patience is highly appreciated! 🙏\n\n";
-                $message .= "Thank you for choosing {$brandName}! 🌟";
-
-                // Dispatch to the Laravel Queue
-                SendWhatsAppMessageJob::dispatch($phone, $message);
-                $queuedCount++;
-            }
+        if ($b->outbound_vehicle_id
+            && !$b->is_outbound_ensured
+            && ($vehicleId === null || (int) $b->outbound_vehicle_id === $vehicleId)
+            && $typeOk($b->outboundVehicle)) {
+            $legs[] = 'outbound';
         }
 
-        return $queuedCount;
+        if ($b->trip_type === 'round_trip'
+            && $b->return_vehicle_id
+            && !$b->is_return_ensured
+            && ($vehicleId === null || (int) $b->return_vehicle_id === $vehicleId)
+            && $typeOk($b->returnVehicle)) {
+            $legs[] = 'return';
+        }
+
+        return $legs;
+    }
+
+    private function lockAndNotifyLegs(Collection $bookings, ?int $vehicleId = null): array
+    {
+        $handled = 0;
+        $queued = 0;
+
+        foreach ($bookings as $record) {
+            $legs = $this->legsToLock($record, $vehicleId);
+
+            if (empty($legs)) {
+                continue;
+            }
+
+            $handled++;
+
+            $lock = [];
+            if (in_array('outbound', $legs, true)) {
+                $lock['is_outbound_ensured'] = true;
+            }
+            if (in_array('return', $legs, true)) {
+                $lock['is_return_ensured'] = true;
+            }
+
+            $digits = preg_replace('/[^0-9]/', '', (string) $record->client?->whatsapp_number);
+
+            if ($digits === '') {
+                $record->update($lock + ['whatsapp_status' => 'failed']);
+                continue;
+            }
+
+            $record->update($lock + ['whatsapp_status' => 'pending']);
+
+            SendWhatsAppMessageJob::dispatch(
+                $record->id,
+                $digits . '@c.us',
+                BookingWhatsAppMessage::clientText($record, $legs)
+            );
+
+            $queued++;
+        }
+
+        return [$handled, $queued];
+    }
+
+    private function whatsappReadyOrNotify(): bool
+    {
+        $greenApi = app(GreenApiService::class);
+
+        if (!$greenApi->isEnabled() || !$greenApi->isConfigured()) {
+            Notification::make()->danger()
+                ->title(__('admin.fleet.whatsapp_not_set_up_title'))
+                ->body(__('admin.fleet.whatsapp_not_set_up_body'))
+                ->send();
+            return false;
+        }
+
+        if (!$greenApi->isAuthorized()) {
+            Notification::make()->danger()
+                ->title(__('admin.fleet.whatsapp_not_connected_title'))
+                ->body(__('admin.fleet.whatsapp_not_connected_body'))
+                ->send();
+            return false;
+        }
+
+        return true;
     }
 
     public function ensureAndNotifyDailyAction(): Action
     {
         return Action::make('ensureAndNotifyDaily')
-            ->label(__('admin.actions.ensure_notify_all') ?? 'Ensure & Notify All')
+            ->label(__('admin.fleet.ensure_notify_all'))
             ->icon('heroicon-s-check-badge')
             ->color('success')
             ->requiresConfirmation()
-            ->modalHeading(__('admin.distribution.confirm_heading') ?? 'Lock & Notify All Assigned Bookings')
-            ->modalDescription(__('admin.distribution.confirm_body') ?? 'This will lock every fully assigned booking for the selected date and queue a WhatsApp confirmation for each client. Locked bookings can no longer be edited or reassigned.')
-            ->modalSubmitActionLabel(__('admin.actions.confirm_lock_notify') ?? 'Yes, lock & notify')
+            ->modalHeading(__('admin.fleet.confirm_heading'))
+            ->modalDescription(__('admin.fleet.confirm_body'))
+            ->modalSubmitActionLabel(__('admin.fleet.confirm_submit'))
             ->action(fn () => $this->ensureAndNotifyDaily());
-    }  
-    
+    }
+
     public function checkGreenApiStatusAction(): Action
     {
         return Action::make('checkGreenApiStatus')
-            ->label('Check WhatsApp Status')
+            ->label(__('admin.fleet.check_whatsapp_status'))
             ->icon('heroicon-o-signal')
             ->color('gray')
             ->action(function () {
                 $service = app(GreenApiService::class);
 
+                if (!$service->isEnabled()) {
+                    Notification::make()->warning()
+                        ->title(__('admin.fleet.whatsapp_disabled_title'))
+                        ->body(__('admin.fleet.whatsapp_disabled_body'))
+                        ->send();
+                    return;
+                }
+
                 if (!$service->isConfigured()) {
-                    Notification::make()
-                        ->danger()
-                        ->title('Green API not configured')
-                        ->body('GREEN_API_INSTANCE_ID or GREEN_API_TOKEN is missing from .env.')
+                    Notification::make()->danger()
+                        ->title(__('admin.fleet.green_not_configured_title'))
+                        ->body(__('admin.fleet.green_not_configured_body'))
                         ->send();
                     return;
                 }
@@ -601,10 +695,10 @@ class BookingDistribution extends Page implements HasActions
                 $state = $service->getInstanceState();
 
                 match ($state) {
-                    'authorized' => Notification::make()->success()->title('WhatsApp connected')->body('The instance is authorized and ready to send.')->send(),
-                    'notAuthorized' => Notification::make()->danger()->title('WhatsApp not linked')->body('Scan the QR code in the Green API console to reconnect.')->send(),
-                    'blocked' => Notification::make()->danger()->title('Instance blocked')->body('This Green API instance has been blocked. Check your console.')->send(),
-                    default => Notification::make()->warning()->title('Could not verify status')->body('State: ' . ($state ?? 'unreachable') . '. Check the Laravel log for details.')->send(),
+                    'authorized' => Notification::make()->success()->title(__('admin.fleet.state_authorized_title'))->body(__('admin.fleet.state_authorized_body'))->send(),
+                    'notAuthorized' => Notification::make()->danger()->title(__('admin.fleet.state_not_authorized_title'))->body(__('admin.fleet.state_not_authorized_body'))->send(),
+                    'blocked' => Notification::make()->danger()->title(__('admin.fleet.state_blocked_title'))->body(__('admin.fleet.state_blocked_body'))->send(),
+                    default => Notification::make()->warning()->title(__('admin.fleet.state_unknown_title'))->body(__('admin.fleet.state_unknown_body', ['state' => $state ?? __('admin.fleet.unreachable')]))->send(),
                 };
             });
     }
@@ -612,54 +706,37 @@ class BookingDistribution extends Page implements HasActions
     public function ensureAndNotifyDaily()
     {
         if (!$this->selectedDate) {
-            Notification::make()->warning()->title('Please select a date first.')->send();
+            Notification::make()->warning()->title(__('admin.fleet.select_date_first'))->send();
             return;
         }
 
-        // STILL IMPORTANT: We verify the API is actually connected before pushing 50 messages to a queue that will fail.
-        $greenApi = app(GreenApiService::class);
-        if (!$greenApi->isAuthorized()) {
-            Notification::make()
-                ->danger()
-                ->title('WhatsApp not connected')
-                ->body('The Green API instance is not authorized. Bookings will NOT be locked until this is fixed — use "Check WhatsApp Status" above for details.')
-                ->send();
+        if (!$this->whatsappReadyOrNotify()) {
             return;
         }
 
-        $bookings = Booking::with(['client', 'tour', 'departure', 'outboundVehicle', 'returnVehicle'])
-            ->where('booking_date', $this->selectedDate)
-            ->where('is_distribution_ensured', false)
-            ->whereNotNull('outbound_vehicle_id')
-            ->where(function ($q) {
-                $q->where('trip_type', 'one_way')
-                  ->orWhereNotNull('return_vehicle_id');
-            })
-            ->when($this->selectedVehicleType, function ($q) {
-                $q->where(function ($sub) {
-                    $sub->whereHas('outboundVehicle', fn ($vq) => $vq->where('type', $this->selectedVehicleType))
-                        ->orWhereHas('returnVehicle', fn ($vq) => $vq->where('type', $this->selectedVehicleType));
-                });
-            })
-            ->get();
+        [$handled, $queuedCount] = $this->lockAndNotifyLegs($this->pendingLegsQuery()->get());
 
-        if ($bookings->isEmpty()) {
+        if ($handled === 0) {
             Notification::make()->warning()
-                ->title('No pending bookings')
-                ->body('No complete, unlocked assignments match the current filters for this date.')
+                ->title(__('admin.fleet.no_pending_title'))
+                ->body(__('admin.fleet.no_pending_body'))
                 ->send();
             return;
         }
 
-        $queuedCount = $this->queueNotificationsForBookings($bookings);
+        $filterNote = '';
+        if ($this->selectedVehicleType) {
+            $vehicleTypeName = $this->selectedVehicleType === 'private_car' ? __('admin.options.private_car') : __('admin.options.shared_microbus');
+            $filterNote = __('admin.fleet.filtered_to', ['type' => $vehicleTypeName]);
+        }
 
-        $filterNote = $this->selectedVehicleType
-            ? ' (filtered to ' . ($this->selectedVehicleType === 'private_car' ? 'Private Car' : 'Shared Microbus') . ')'
-            : '';
+        $body = __('admin.fleet.ensured_body', [
+            'count' => $handled,
+            'note' => $filterNote,
+            'queued' => $queuedCount
+        ]);
 
-        $body = "Locked {$bookings->count()} bookings{$filterNote} and queued {$queuedCount} WhatsApp messages for delivery.";
-
-        Notification::make()->success()->title('Distribution Ensured')->body($body)->send();
+        Notification::make()->success()->title(__('admin.fleet.ensured_title'))->body($body)->send();
 
         $this->dispatch('refresh-map');
     }
@@ -667,51 +744,44 @@ class BookingDistribution extends Page implements HasActions
     public function ensureAndNotifyForVehicle(int $vehicleId): void
     {
         if (!$this->selectedDate) {
-            Notification::make()->warning()->title('Please select a date first.')->send();
+            Notification::make()->warning()->title(__('admin.fleet.select_date_first'))->send();
             return;
         }
 
-        $greenApi = app(GreenApiService::class);
-        if (!$greenApi->isAuthorized()) {
-            Notification::make()->danger()->title('WhatsApp not connected')
-                ->body('The Green API instance is not authorized. Use "Check WhatsApp Status" for details.')
-                ->send();
+        if (!$this->whatsappReadyOrNotify()) {
             return;
         }
 
         $vehicle = Vehicle::find($vehicleId);
         if (!$vehicle) {
-            Notification::make()->danger()->title('Vehicle not found')->send();
+            Notification::make()->danger()->title(__('admin.fleet.vehicle_not_found'))->send();
             return;
         }
 
-        $bookings = Booking::with(['client', 'tour', 'departure', 'outboundVehicle', 'returnVehicle'])
-            ->where('booking_date', $this->selectedDate)
-            ->where('is_distribution_ensured', false)
-            ->whereNotNull('outbound_vehicle_id')
-            ->where(function ($q) {
-                $q->where('trip_type', 'one_way')
-                  ->orWhereNotNull('return_vehicle_id');
-            })
+        $bookings = $this->pendingLegsQuery()
             ->where(function ($q) use ($vehicleId) {
                 $q->where('outbound_vehicle_id', $vehicleId)
                   ->orWhere('return_vehicle_id', $vehicleId);
             })
             ->get();
 
-        if ($bookings->isEmpty()) {
+        [$handled, $queuedCount] = $this->lockAndNotifyLegs($bookings, $vehicleId);
+
+        if ($handled === 0) {
             Notification::make()->warning()
-                ->title('Nothing to notify')
-                ->body("No complete, unlocked bookings are assigned to {$vehicle->plate_number} for this date.")
+                ->title(__('admin.fleet.nothing_to_notify_title'))
+                ->body(__('admin.fleet.nothing_to_notify_body', ['plate' => $vehicle->plate_number]))
                 ->send();
             return;
         }
 
-        $queuedCount = $this->queueNotificationsForBookings($bookings);
+        $body = __('admin.fleet.vehicle_ensured_body', [
+            'count' => $handled,
+            'plate' => $vehicle->plate_number,
+            'queued' => $queuedCount
+        ]);
 
-        $body = "Locked {$bookings->count()} booking(s) for {$vehicle->plate_number} and queued {$queuedCount} WhatsApp message(s) for delivery.";
-
-        Notification::make()->success()->title('Vehicle Distribution Ensured')->body($body)->send();
+        Notification::make()->success()->title(__('admin.fleet.vehicle_ensured_title'))->body($body)->send();
 
         $this->dispatch('refresh-map');
     }
@@ -719,14 +789,14 @@ class BookingDistribution extends Page implements HasActions
     public function ensureVehicleAction(): Action
     {
         return Action::make('ensureVehicle')
-            ->label('Ensure & Notify')
+            ->label(__('admin.fleet.ensure_notify_vehicle'))
             ->icon('heroicon-s-check-badge')
             ->color('success')
             ->size(ActionSize::Small)
             ->requiresConfirmation()
-            ->modalHeading(fn (array $arguments) => 'Lock & Notify Bookings for ' . ($arguments['plate'] ?? 'this Vehicle'))
-            ->modalDescription('This will lock every fully assigned, unlocked booking for this vehicle on the selected date and queue a WhatsApp confirmation for each client.')
-            ->modalSubmitActionLabel('Yes, lock & notify')
+            ->modalHeading(fn (array $arguments) => __('admin.fleet.vehicle_modal_heading', ['plate' => $arguments['plate'] ?? __('admin.fleet.this_vehicle')]))
+            ->modalDescription(__('admin.fleet.vehicle_modal_body'))
+            ->modalSubmitActionLabel(__('admin.fleet.confirm_submit'))
             ->action(function (array $arguments) {
                 $this->ensureAndNotifyForVehicle((int) $arguments['vehicleId']);
             });

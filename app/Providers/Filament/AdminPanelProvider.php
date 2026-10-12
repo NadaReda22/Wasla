@@ -22,7 +22,6 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        // Fetch your dynamic settings safely
         $settings = Setting::first();
         $brandLogo = $settings?->brand_logo ? \Illuminate\Support\Facades\Storage::url($settings->brand_logo) : asset('images/logo.png');
         
@@ -92,7 +91,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                \App\Http\Middleware\SetFilamentLocale::class, // <-- ADDED CUSTOM MIDDLEWARE HERE
+                \App\Http\Middleware\SetFilamentLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

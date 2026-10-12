@@ -4,7 +4,7 @@
 
 {{-- PASS DB POLYGONS TO THE FRONTEND --}}
 <script>
-   window.bookingAreas = {!! $areas->toJson() !!};
+    window.bookingAreas = {!! $areas->toJson() !!};
 </script>
 
 <div class="min-h-screen bg-[#fdfbf7] pb-24 font-sans selection:bg-[#1877c9] selection:text-white" x-data="bookingEngine(@js($routes), @js(__('booking')), @js($limits))">
@@ -52,23 +52,23 @@
      @php
         $settings = \App\Models\Setting::first();
     @endphp
-  <section class="relative py-16 md:py-20 flex items-center overflow-hidden gradient-navy">
+  <section class="relative pt-32 pb-16 md:pt-40 md:pb-20 flex items-center overflow-hidden gradient-navy">
         <div class="absolute inset-0">
             <img src="{{ !empty($settings?->booking_background) ? asset('storage/' . $settings->booking_background) : asset('images/booking-background.png') }}" 
                  alt="Sharm El Sheikh" 
-                 class="w-full h-full object-cover opacity-70" />
+                 class="w-full h-full object-cover object-[80%_center] sm:object-center opacity-70" />
         </div>
         <div class="absolute inset-0 bg-gradient-to-b from-navy/80 via-navy/40 to-navy"></div>
 
         <div class="container-max px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            <div class="inline-flex items-center gap-2 badge-gold mb-6 animate-fade-in">
-                <span class="w-2 h-2 bg-gold rounded-full animate-pulse"></span>
+            <div class="inline-flex items-center gap-1.5 sm:gap-2 badge-gold text-[10px] sm:text-sm px-3 py-1 sm:px-4 sm:py-2 mb-4 animate-fade-in">
+                <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gold rounded-full animate-pulse"></span>
                 {{ __('booking.badge') }}
             </div>
-            <h1 class="text-4xl sm:text-5xl font-display font-bold text-white mb-4 animate-slide-up text-balance">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3 sm:mb-4 animate-slide-up text-balance">
                 {{ __('booking.heading') }}
             </h1>
-            <p class="text-white/80 text-lg max-w-xl mx-auto animate-slide-up">
+            <p class="text-white/80 text-sm sm:text-lg max-w-xl mx-auto animate-slide-up">
                 {{ __('booking.subheading') }}
             </p>
         </div>
@@ -76,39 +76,39 @@
 
     <div class="pt-10">
         {{-- INSTRUCTIONS WINDOW --}}
-        <div class="max-w-4xl mx-auto px-4 mb-6">
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden" x-data="{ expanded: false }">
+        <div class="max-w-4xl mx-auto px-4 mb-6 mt-4 sm:mt-0">
+            <div class="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden" x-data="{ expanded: false }">
                 <button type="button" @click="expanded = !expanded"
-                    class="w-full bg-[#f0f7ff] px-6 py-4 border-b border-[#e1effe] flex items-center justify-between gap-3 text-left transition-colors hover:bg-[#e6f2ff]">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-[#1877c9] text-white rounded-full w-6 h-6 flex items-center justify-center font-bold text-sm">i</div>
+                    class="w-full bg-[#f0f7ff] px-4 py-3 sm:px-6 sm:py-4 border-b border-[#e1effe] flex items-center justify-between gap-2 sm:gap-3 text-left transition-colors hover:bg-[#e6f2ff]">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="bg-[#1877c9] text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-bold text-xs sm:text-sm shrink-0">i</div>
                         <div>
-                            <h2 class="font-extrabold text-navy text-lg leading-tight">{{ __('booking.read_this_first') }}</h2>
-                            <p class="text-xs text-navy/50" x-show="!expanded">{{ __('booking.tap_to_expand') }}</p>
+                            <h2 class="font-extrabold text-navy text-base sm:text-lg leading-tight">{{ __('booking.read_this_first') }}</h2>
+                            <p class="text-[10px] sm:text-xs text-navy/50" x-show="!expanded">{{ __('booking.tap_to_expand') }}</p>
                         </div>
                     </div>
-                    <svg class="w-5 h-5 text-[#1877c9] transition-transform duration-300 flex-shrink-0" :class="expanded ? 'rotate-180' : ''"
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#1877c9] transition-transform duration-300 flex-shrink-0" :class="expanded ? 'rotate-180' : ''"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
 
-                <div x-show="expanded" x-transition class="p-6 md:p-8" style="display: none;">
+                <div x-show="expanded" x-transition class="p-4 sm:p-6 md:p-8" style="display: none;">
                     <x-instructions-content />
                 </div>
 
-                <div class="px-6 md:px-8 py-5 border-t border-gray-100 bg-gray-50/50">
-                    <label class="flex items-center gap-3 cursor-pointer group w-max select-none">
+                <div class="px-4 py-4 sm:px-6 sm:py-5 border-t border-gray-100 bg-gray-50/50">
+                    <label class="flex items-start sm:items-center gap-2 sm:gap-3 cursor-pointer group select-none w-full">
                         <input type="checkbox" x-model="agreedToTerms" class="hidden">
-                        <div class="w-6 h-6 rounded-full border-2 transition-all duration-200 flex items-center justify-center shadow-sm"
+                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 transition-all duration-200 flex items-center justify-center shadow-sm shrink-0 mt-0.5 sm:mt-0"
                              :class="agreedToTerms ? 'border-[#1877c9] bg-[#1877c9]' : 'border-gray-300 bg-white'">
-                            <svg class="w-3.5 h-3.5 text-white transition-opacity duration-200"
+                            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white transition-opacity duration-200"
                                  :class="agreedToTerms ? 'opacity-100' : 'opacity-0'"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                             </svg>
                         </div>
-                        <span class="font-bold transition-colors" :class="agreedToTerms ? 'text-[#1877c9]' : 'text-navy group-hover:text-[#1877c9]'">
+                        <span class="font-bold text-[11px] sm:text-base leading-snug sm:leading-normal transition-colors" :class="agreedToTerms ? 'text-[#1877c9]' : 'text-navy group-hover:text-[#1877c9]'">
                             {{ __('booking.agree_to_instructions') }}
                         </span>
                     </label>
@@ -181,9 +181,9 @@
 
                     <!-- Choose your ride -->
                     <div class="relative mb-6">
-                        <div class="hidden sm:flex absolute top-1/2 right-[-1%] -translate-y-1/2 z-20 pointer-events-none">
-                            <img x-show="vehicleType === 'microbus'" src="{{ asset('images/microbus-placeholder.png') }}" class="w-72 h-auto object-contain drop-shadow-2xl transition-all duration-500" alt="Microbus">
-                            <img x-show="vehicleType === 'private'" style="display:none" src="{{ asset('images/vehicle-private-placeholder.png') }}" class="w-64 md:w-80 h-auto object-contain drop-shadow-2xl transition-all duration-500" alt="Private Car">
+                        <div class="flex absolute bottom-2 right-[-2%] sm:bottom-auto sm:top-1/2 sm:right-[-1%] sm:-translate-y-1/2 z-20 pointer-events-none">
+                            <img x-show="vehicleType === 'microbus'" src="{{ asset('images/microbus-placeholder.png') }}" class="w-64 sm:w-72 h-auto object-contain drop-shadow-2xl transition-all duration-500" alt="Microbus">
+                            <img x-show="vehicleType === 'private'" style="display:none" src="{{ asset('images/vehicle-private-placeholder.png') }}" class="w-60 sm:w-64 md:w-80 h-auto object-contain drop-shadow-2xl transition-all duration-500" alt="Private Car">
                         </div>
 
                         <div class="rounded-3xl overflow-hidden flex flex-col shadow-md">
@@ -233,7 +233,7 @@
                                         </label>
                                     </div>
                                 </div>
-                                <div class="w-full sm:w-[40%] bg-gold relative min-h-[120px] sm:min-h-auto overflow-hidden"></div>
+                                <div class="w-full sm:w-[40%] bg-gold relative min-h-[160px] sm:min-h-auto overflow-hidden"></div>
                             </div>
                         </div>
                     </div>
@@ -489,7 +489,7 @@
                         <div class="bg-white/10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" x-text="tripType === 'one-way' ? t.step1.one_way : t.step1.round_trip"></div>
                     </div>
 
-                    {{-- Tour Name (English & Arabic Separated) --}}
+                    {{-- Tour Name  --}}
                     <div class="mb-6">
                         <h3 class="text-2xl font-extrabold leading-tight" x-text="routeName || t.summary.select_route"></h3>
                         <div x-show="routeArabicName" class="text-sm font-medium text-white/70 mt-1" x-text="routeArabicName"></div>
@@ -510,7 +510,7 @@
                             <span class="font-bold" x-text="passengers"></span>
                         </div>
                         
-                        {{-- Hotel Name (English & Arabic Separated) --}}
+                        {{-- Hotel Name  --}}
                         <div class="flex justify-between items-start text-sm">
                             <span class="text-white/70 mt-0.5">{{ __('booking.summary.pickup_point') }}</span>
                             <div class="text-right flex flex-col items-end">
@@ -600,7 +600,7 @@
                 
                 routeId: '',
                 routeName: '',
-                routeArabicName: '', // Separated
+                routeArabicName: '', // 
                 departureDate: '', 
                 departureTime: '',
                 passengers: 1,
@@ -613,8 +613,8 @@
                 receptionNumber: '',
                 
                 hotel: '',
-                hotelDisplayEn: '', // Separated EN
-                hotelDisplayAr: '', // Separated AR
+                hotelDisplayEn: '', //  EN
+                hotelDisplayAr: '', //  AR
                 pickupLat: null,
                 pickupLng: null,
                 pickupAddress: '',

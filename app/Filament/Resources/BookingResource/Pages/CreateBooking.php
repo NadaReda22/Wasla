@@ -12,13 +12,9 @@ class CreateBooking extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Auto-generate the booking reference before saving to the database
         $data['booking_reference'] = 'BKG-' . strtoupper(Str::random(8));
-        
-        // Default payment status for manual admin bookings
-        if (!isset($data['payment_status'])) {
-            $data['payment_status'] = 'paid'; // Or 'pending' if you prefer
-        }
+        $data['payment_status'] = 'paid';
+        $data['deposit_paid'] = 0;
 
         return $data;
     }

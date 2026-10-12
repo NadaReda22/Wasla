@@ -2,12 +2,12 @@
 
 return [
 
-'colors' => [
-    'primary' => 'أزرق أساسي', 'turquoise' => 'فيروزي', 'navy' => 'كحلي',
-    'coral' => 'مرجاني', 'gold' => 'ذهبي', 'primary_400' => 'أزرق فاتح',
-    'random' => 'عشوائي', 'random_color' => 'لون عشوائي',
-],
-'areas_map' => ['zone_popup' => 'منطقة :name'],
+    'colors' => [
+        'primary' => 'أزرق أساسي', 'turquoise' => 'فيروزي', 'navy' => 'كحلي',
+        'coral' => 'مرجاني', 'gold' => 'ذهبي', 'primary_400' => 'أزرق فاتح',
+        'random' => 'عشوائي', 'random_color' => 'لون عشوائي',
+    ],
+    'areas_map' => ['zone_popup' => 'منطقة :name'],
     'groups' => [
         'zones_and_pricing' => 'المناطق والأسعار',
         'tours_management' => 'إدارة الرحلات',
@@ -119,6 +119,7 @@ return [
         'distribution_status' => 'حالة التوزيع',
         'price_type' => 'نوع السعر',
         'date' => 'التاريخ',
+        'ensured' => 'مؤكد',
     ],
 
     'fields' => [
@@ -188,7 +189,7 @@ return [
         'booking_background' => 'خلفية صفحة الحجز',
         'area_help' => 'اربط هذا الفندق بمنطقة تسعير.',
         'sort_order_help' => 'الأرقام الأقل تظهر أولاً.',
-        'answer_ar' => 'الإجابة (انجليزي)',
+        'answer_ar' => 'الإجابة (عربي)',
         'latitude_example' => 'مثال: 27.9158',
         'longitude_example' => 'مثال: 34.3298',
         'color_help' => 'اتركه فارغاً للحصول على لون عشوائي.',
@@ -233,6 +234,8 @@ return [
         'delete' => 'حذف',
         'mark_cash_paid' => 'تحديد كمستلم النقد',
         'mark_cash_unpaid' => 'تحديد كغير مستلم النقد',
+        'delete_pricing_offer' => 'حذف إعداد السعر', 
+        'delete_departure' => 'حذف موعد المغادرة'
     ],
 
     'tabs' => [
@@ -268,6 +271,10 @@ return [
         'slot_capacity' => 'سعة المركبة',
         'no_active_vehicles' => 'لا توجد مركبات نشطة مسجلة.',
         'no_unassigned_bookings' => 'لم يتم العثور على حجوزات غير موزعة لهذا الفلتر.',
+        'no_bookings' => 'لم يتم العثور على حجوزات غير موزعة لهذا الفلتر.',
+        'click_to_zoom' => 'اضغط للتقريب على الخريطة',
+        'all_locked' => 'الكل مقفل',
+        'locked' => 'مقفول',
     ],
 
     'dashboard' => [
@@ -283,6 +290,23 @@ return [
         'weekly_bookings' => 'الحجوزات والإيرادات الأسبوعية',
         'revenue' => 'الإيرادات',
         'payment_split' => 'توزيع طرق الدفع',
+        'total_profits_all_time' => 'إجمالي الأرباح (كل الأوقات)',
+        'total_gross_revenue' => 'إجمالي الإيرادات الكلية',
+        'sales_generated_today' => 'المبيعات التي تمت اليوم',
+        'collectable' => 'قيد التحصيل',
+        'requires_driver_collection' => 'يتطلب التحصيل من السائق',
+        'successful_reservations' => 'الحجوزات الناجحة',
+        'unique_customers' => 'العملاء المسجلين الفريدين',
+        'avg_seats_per_day' => 'متوسط المقاعد / اليوم',
+        'across_operational_days' => 'عبر جميع أيام التشغيل النشطة',
+        'sales_performance' => 'أداء المبيعات',
+        'last_7_days' => 'آخر 7 أيام',
+        'bookings_count' => 'عدد الحجوزات',
+        'revenue_usd' => 'الإيرادات ($)',
+        'top_performing_tours' => 'أفضل الرحلات أداءً',
+        'by_total_booking_count' => 'حسب إجمالي عدد الحجوزات',
+        'no_tour_data' => 'لا توجد بيانات للرحلات بعد.',
+        'sharm_el_sheikh' => 'شرم الشيخ',
     ],
 
     'notifications' => [
@@ -315,6 +339,7 @@ return [
         'bookings_assigned_body' => 'تم تعيين رحلة الـ :direction إلى :plate',
         'bookings_unassigned' => 'تم إلغاء تعيين الحجوزات',
         'bookings_unassigned_body' => 'تمت إزالة :count حجز من رحلة الـ :direction للمركبة.',
+        'capacity_exceeded_slot_body' => 'تم تجاوز السعة لرحلة :time! المركبة بها :existing مقعد بالفعل وتحتاج :needed مقعد إضافي (الحد الأقصى :max).',
     ],
 
     'options' => [
@@ -343,6 +368,7 @@ return [
         'all_zones' => 'كل المناطق',
         'na' => 'غير متوفر',
         'unknown' => 'غير معروف',
+        'unassigned' => 'غير موزع',
     ],
     
     'list_tours' => [
@@ -443,33 +469,166 @@ return [
 
         'cannot_switch_live' => 'لا يمكن التبديل للوضع الحقيقي',
         'fill_live_credentials' => 'يرجى ملء بيانات الوضع الحقيقي بالكامل (رقم التاجر والمفاتيح) أولاً.',
-        'type' => 'النوع',
         'policy_key' => 'معرّف القسم',
     ],
+
+    'booking' => [
+        'client_details' => 'بيانات العميل الكاملة',
+        'full_name' => 'الاسم الكامل',
+        'whatsapp_number' => 'رقم الواتساب',
+        'email_address' => 'البريد الإلكتروني',
+        'no_email' => 'لا يوجد بريد إلكتروني',
+        'client_search' => 'العميل (بحث بالهاتف)',
+        'tour' => 'الرحلة',
+        'tour_date' => 'تاريخ الرحلة',
+        'specific_tour_date' => 'تاريخ رحلة محدد',
+        'vehicle_for_pricing' => 'المركبة (للتسعير)',
+        'seats_count' => 'عدد المقاعد',
+        'hotel_location' => 'الفندق / الموقع',
+        'room_number' => 'رقم الغرفة',
+        'reception_number' => 'رقم الاستقبال',
+        'pickup_address' => 'عنوان الاستلام',
+        'google_maps_location' => 'الموقع على خرائط جوجل',
+        'open_in_maps' => 'فتح الموقع على خرائط جوجل',
+        'no_map_coordinates' => 'لا توجد إحداثيات للموقع.',
+        'no_zone' => 'بدون منطقة',
+        'deposit_paid' => 'العربون المدفوع',
+        'cash_due_on_board' => 'المبلغ المستحق نقداً عند الركوب',
+        'payment' => 'الدفع',
+        'payment_status' => 'حالة الدفع',
+        'whatsapp_status' => 'حالة الواتساب',
+        'distribution_ensured' => 'تأكيد التوزيع',
+        'ensured_locked' => 'مؤكد (مقفل)',
+        'not_ensured' => 'غير مؤكد (مفتوح)',
+        'message_driver' => 'مراسلة السائق',
+        'open_whatsapp' => 'فتح واتساب',
+        'leg_ensured' => 'مؤكد',
+        'leg_waiting' => 'بانتظار التأكيد',
+     
+        'payment_statuses' => [
+            'pending' => 'قيد الانتظار',
+            'paid' => 'مدفوع',
+            'failed' => 'فشل',
+        ],
+     
+        'whatsapp_statuses' => [
+            'pending' => 'قيد الإرسال',
+            'sent' => 'تم الإرسال',
+            'failed' => 'فشل',
+        ],
+     
+        'notifications' => [
+            'action_forbidden' => 'إجراء غير مسموح',
+            'manifest_filters_required' => 'يجب تطبيق فلتر "تاريخ رحلة محدد" وفلتر "السائق" قبل إرسال الكشف اليومي.',
+            'missing_driver_title' => 'بيانات السائق ناقصة',
+            'missing_driver_body' => 'لم يتم اختيار سائق أو رقم هاتف السائق غير موجود.',
+            'no_valid_title' => 'لا توجد حجوزات صالحة',
+            'no_valid_body' => 'لا توجد لهذا السائق حجوزات مدفوعة ومؤكدة في هذا التاريخ.',
+            'manifest_ready' => 'الكشف جاهز',
+            'locked_title' => 'بعض الحجوزات مقفلة',
+            'locked_body' => 'ألغِ قفل الحجوزات المقفلة قبل حذفها.',
+        ],
+    ],
+
+    'fleet' => [
+    'ensure_notify_all' => 'تأكيد وإشعار الكل',
+    'confirm_heading' => 'قفل وإشعار جميع الحجوزات الموزعة',
+    'confirm_body' => 'سيتم قفل كل اتجاه موزع (ذهاب أو عودة) في التاريخ المحدد وإضافة رسالة تأكيد واتساب لكل عميل إلى قائمة الإرسال. لا يمكن تعديل الاتجاه المقفل أو إعادة توزيعه أو إزالته.',
+    'confirm_submit' => 'نعم، اقفل وأرسل الإشعارات',
+    'ensure_notify_vehicle' => 'تأكيد وإشعار',
+    'vehicle_modal_heading' => 'قفل وإشعار حجوزات :plate',
+    'this_vehicle' => 'هذه المركبة',
+    'vehicle_modal_body' => 'سيتم قفل كل اتجاه موزع وغير مقفل لهذه المركبة في التاريخ المحدد وإضافة رسالة تأكيد واتساب لكل عميل إلى قائمة الإرسال.',
+    'check_whatsapp_status' => 'فحص حالة الواتساب',
  
+    'cannot_reassign_locked' => 'لا يمكنك إعادة توزيع اتجاه تم تأكيده وقفله بالفعل.',
+    'cannot_unassign_locked' => 'لا يمكنك إلغاء توزيع اتجاه تم تأكيده وقفله بالفعل.',
+    'leg_locked_hint' => 'هذا الاتجاه مقفل بالفعل وتم إرسال الإشعار.',
+    'unpaid_selected_title' => 'تم تحديد حجوزات غير مدفوعة',
+    'unpaid_selected_body' => 'يمكن توزيع الحجوزات التي حالة دفعها "مدفوع" فقط.',
+ 
+    'select_date_first' => 'الرجاء تحديد التاريخ أولاً.',
+    'tbd' => 'لم يُحدد',
+    'unreachable' => 'غير متاح',
+    'vehicle_not_found' => 'المركبة غير موجودة',
+ 
+    'whatsapp_not_set_up_title' => 'الواتساب غير مُعَد',
+    'whatsapp_not_set_up_body' => 'فعّل الواتساب واضبط إعداداته من الإعدادات ← الربط. لن يتم قفل الحجوزات قبل ذلك.',
+    'whatsapp_not_connected_title' => 'الواتساب غير متصل',
+    'whatsapp_not_connected_body' => 'نسخة Green API غير مصرح بها. لن يتم قفل الحجوزات حتى تُحل المشكلة — استخدم "فحص حالة الواتساب" لمعرفة التفاصيل.',
+    'whatsapp_disabled_title' => 'ربط الواتساب معطّل',
+    'whatsapp_disabled_body' => 'فعّله من الإعدادات ← الربط.',
+    'green_not_configured_title' => 'Green API غير مضبوط',
+    'green_not_configured_body' => 'رابط الـ Host أو معرف النسخة أو الـ Token ناقص. اضبطها من الإعدادات ← الربط.',
+ 
+    'state_authorized_title' => 'الواتساب متصل',
+    'state_authorized_body' => 'النسخة مصرح بها وجاهزة للإرسال.',
+    'state_not_authorized_title' => 'الواتساب غير مربوط',
+    'state_not_authorized_body' => 'امسح رمز QR من لوحة Green API لإعادة الربط.',
+    'state_blocked_title' => 'النسخة محظورة',
+    'state_blocked_body' => 'تم حظر نسخة Green API هذه. راجع لوحة التحكم الخاصة بها.',
+    'state_unknown_title' => 'تعذر التحقق من الحالة',
+    'state_unknown_body' => 'الحالة: :state. راجع سجل Laravel لمعرفة التفاصيل.',
+ 
+    'no_pending_title' => 'لا توجد حجوزات معلقة',
+    'no_pending_body' => 'لا توجد اتجاهات موزعة وغير مقفلة ومدفوعة تطابق الفلاتر الحالية في هذا التاريخ.',
+    'filtered_to' => ' (مصفّاة حسب :type)',
+    'ensured_title' => 'تم تأكيد التوزيع',
+    'ensured_body' => 'تم قفل :count حجز:note وإضافة :queued رسالة واتساب إلى قائمة الإرسال.',
+    'nothing_to_notify_title' => 'لا يوجد ما يستحق الإشعار',
+    'nothing_to_notify_body' => 'لا توجد اتجاهات غير مقفلة ومدفوعة موزعة على :plate في هذا التاريخ.',
+    'vehicle_ensured_title' => 'تم تأكيد توزيع المركبة',
+    'vehicle_ensured_body' => 'تم قفل :count حجز للمركبة :plate وإضافة :queued رسالة واتساب إلى قائمة الإرسال.',
+    'all_locked_notified' => 'جميع الحجوزات لهذه المركبة مقفلة وتم إرسال الإشعارات.',
+],
 
-    //operation dashboard 
-     'dashboard' => [
-    'total_profits_all_time' => 'إجمالي الأرباح (كل الأوقات)',
-    'total_gross_revenue' => 'إجمالي الإيرادات الكلية',
-    'sales_generated_today' => 'المبيعات التي تمت اليوم',
-    'collectable' => 'قيد التحصيل',
-    'requires_driver_collection' => 'يتطلب التحصيل من السائق',
-    'successful_reservations' => 'الحجوزات الناجحة',
-    'unique_customers' => 'العملاء المسجلين الفريدين',
-    'avg_seats_per_day' => 'متوسط المقاعد / اليوم',
-    'across_operational_days' => 'عبر جميع أيام التشغيل النشطة',
-    'sales_performance' => 'أداء المبيعات',
-    'last_7_days' => 'آخر 7 أيام',
-    'bookings_count' => 'عدد الحجوزات',
-    'revenue_usd' => 'الإيرادات ($)',
-    'top_performing_tours' => 'أفضل الرحلات أداءً',
-    'by_total_booking_count' => 'حسب إجمالي عدد الحجوزات',
-    'no_tour_data' => 'لا توجد بيانات للرحلات بعد.',
-    'sharm_el_sheikh' => 'شرم الشيخ',
-    'todays_revenue' => ' الإيرادات اليومية',
-    'pending_cash' => 'النقد المعلق',
+'vehicle' => [
+    'placeholder_plate' => 'مثال: ABC 1234',
+    'placeholder_driver_name' => 'مثال: أحمد علي',
+    'placeholder_driver_phone' => 'مثال: 201000000000',
+    'delete_blocked_title' => 'لا يمكن حذف المركبة',
+    'delete_blocked_body' => 'هذه المركبة مرتبطة بحجوزات موجودة. قم بإلغاء تفعيلها بدلاً من ذلك (أوقف "حالة النشاط") للحفاظ على سجل الحجوزات.',
+],
+// ============================================================
+'client' => [
+    'nationality_help' => '2-letter country code (e.g., EG, GB, RU)',
+    'delete_blocked_title' => 'Cannot delete client',
+    'delete_blocked_body' => 'This client has existing bookings. Delete or reassign those bookings first so booking history stays intact.',
+    'booking_references' => 'Booking References',
+    'no_bookings' => 'No bookings yet',
+],
 
-     ],
-    
+'payments' => [
+    'transaction_details' => 'تفاصيل المعاملة',
+    'booking_client_info' => 'معلومات الحجز والعميل',
+    'order_id' => 'رقم الطلب',
+    'amount' => 'المبلغ',
+    'currency' => 'العملة',
+    'status' => 'الحالة',
+    'booking_ref' => 'رقم الحجز',
+    'client_id' => 'رقم العميل',
+    'client_name' => 'اسم العميل',
+    'whatsapp' => 'واتساب',
+    'email' => 'البريد الإلكتروني',
+    'nationality' => 'الجنسية',
+    'tour' => 'الجولة',
+    'tour_date' => 'تاريخ الجولة',
+    'passengers' => 'الركاب',
+    'pickup' => 'الفندق / نقطة الالتقاء',
+    'room' => 'الغرفة',
+    'reception' => 'رقم الاستقبال',
+    'date' => 'التاريخ',
+    'tabs' => [
+        'all' => 'كل المعاملات',
+        'paid' => 'مدفوع',
+        'pending' => 'قيد الانتظار',
+        'failed' => 'فشل',
+    ],
+    'statuses' => [
+        'paid' => 'مدفوع',
+        'pending' => 'قيد الانتظار',
+        'failed' => 'فشل',
+    ],
+],
+
 ];

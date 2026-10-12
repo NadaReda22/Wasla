@@ -15,58 +15,59 @@
 @endphp
 
 <div>
-    <section class="relative min-h-[90vh] flex items-center overflow-hidden gradient-navy">
-        <div class="absolute inset-0">
-            <img src="{{ !empty($settings?->landing_background) ? asset('storage/' . $settings->landing_background) : '/images/landing-background.png' }}" 
-                alt="Sharm El Sheikh" 
-                class="w-full h-full object-cover opacity-70" />
-        </div>
-        <div class="absolute inset-0 bg-gradient-to-b from-navy/70 via-navy/50 to-navy"></div>
+    <section class="relative min-h-[75vh] lg:min-h-[90vh] flex items-center overflow-hidden gradient-navy py-16 lg:py-0">
+    <div class="absolute inset-0">
+        <img src="{{ !empty($settings?->landing_background) ? asset('storage/' . $settings->landing_background) : '/images/landing-background.png' }}" 
+            alt="Sharm El Sheikh" 
+            class="w-full h-full object-cover opacity-70" />
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-navy/70 via-navy/50 to-navy"></div>
 
-        <div class="container-max px-4 sm:px-6 lg:px-8 relative z-10 pt-20">
-            <div class="max-w-3xl">
-                <div class="inline-flex items-center gap-2 badge-gold mb-6 animate-fade-in">
-                    <span class="w-2 h-2 bg-gold rounded-full animate-pulse"></span>
-                    {{ __('home.hero_badge') }}
+    <div class="container-max px-4 sm:px-6 lg:px-8 relative z-10 pt-24 md:pt-20">
+        <div class="max-w-3xl">
+            <div class="inline-flex items-center gap-1.5 md:gap-2 badge-gold mb-4 md:mb-6 animate-fade-in text-xs md:text-sm px-2.5 py-1 md:px-3 md:py-1.5">
+                <span class="w-1.5 h-1.5 md:w-2 md:h-2 bg-gold rounded-full animate-pulse"></span>
+                {{ __('home.hero_badge') }}
+            </div>
+
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white whitespace-normal md:whitespace-nowrap leading-tight mb-4 md:mb-6 animate-slide-up">
+                {{ __('home.hero_title') }}
+                <span class="block text-gold mt-1 md:mt-2">{{ __('home.hero_price_line', ['price' => '$' . number_format($minCost, 2)]) }}</span>
+            </h1>
+
+            <p class="text-base md:text-xl text-white/80 mb-6 md:mb-8 leading-relaxed max-w-2xl animate-slide-up">
+                {{ __('home.hero_desc', ['deposit' => '$' . number_format($depCost, 2)]) }}
+            </p>
+            
+            <div class="flex flex-wrap gap-3 md:gap-4 animate-slide-up">
+                <a href="{{ route('booking.create') }}" class="btn-gold text-base md:text-lg px-5 py-3 md:px-8 md:py-4 flex items-center">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {{ __('home.book_seat') }}
+                </a>
+                <a href="#tours" class="btn-outline text-base md:text-lg px-5 py-3 md:px-8 md:py-4 border-white/30 text-white hover:bg-white hover:text-navy">
+                    {{ __('home.browse_tours') }}
+                </a>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 md:gap-6 mt-8 md:mt-12 max-w-lg">
+                <div>
+                    <div class="text-xl md:text-3xl font-bold text-gold">{{ count($areas) }}+</div>
+                    <div class="text-[#195E9D] font-semibold text-xs md:text-sm">{{ __('home.destinations') }}</div>
                 </div>
-
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white whitespace-nowrap leading-tight mb-6 animate-slide-up">
-                    {{ __('home.hero_title') }}
-                    <span class="block text-gold mt-2 whitespace-normal">{{ __('home.hero_price_line', ['price' => '$' . number_format($minCost, 2)]) }}</span>
-                </h1>
-
-                <p class="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed max-w-2xl animate-slide-up">
-                    {{ __('home.hero_desc', ['deposit' => '$' . number_format($depCost, 2)]) }}
-                </p>
-                <div class="flex flex-wrap gap-4 animate-slide-up">
-                    <a href="{{ route('booking.create') }}" class="btn-gold text-lg px-8 py-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        {{ __('home.book_seat') }}
-                    </a>
-                    <a href="#tours" class="btn-outline text-lg px-8 py-4 border-white/30 text-white hover:bg-white hover:text-navy">
-                        {{ __('home.browse_tours') }}
-                    </a>
+                <div>
+                    <div class="text-xl md:text-3xl font-bold text-gold">${{ number_format($minCost, 2) }}</div>
+                    <div class="text-[#195E9D] font-semibold text-xs md:text-sm">{{ __('home.flat_rate') }}</div>
                 </div>
-
-                <div class="grid grid-cols-3 gap-6 mt-12 max-w-lg">
-                    <div>
-                        <div class="text-3xl font-bold text-gold">{{ count($areas) }}+</div>
-                        <div class="text-[#195E9D] font-semibold text-sm">{{ __('home.destinations') }}</div>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-bold text-gold">${{ number_format($minCost, 2) }}</div>
-                        <div class="text-[#195E9D] font-semibold text-sm">{{ __('home.flat_rate') }}</div>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-bold text-gold">${{ number_format($depCost, 2) }}</div>
-                        <div class="text-[#195E9D] font-semibold text-sm">{{ __('home.deposit_only') }}</div>
-                    </div>
+                <div>
+                    <div class="text-xl md:text-3xl font-bold text-gold">${{ number_format($depCost, 2) }}</div>
+                    <div class="text-[#195E9D] font-semibold text-xs md:text-sm">{{ __('home.deposit_only') }}</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
-    </section>
+    <div class="absolute bottom-0 left-0 right-0 h-16 md:h-24 bg-gradient-to-t from-white to-transparent"></div>
+</section>
 
     {{-- Dynamic Offer Bar --}}
     <div class="bg-coral text-white py-3 overflow-hidden">

@@ -92,7 +92,7 @@ return [
         'total_fare' => 'Total Fare',
         'deposit_due_now' => 'Deposit Due Now',
         'balance_on_board' => 'Balance (Pay on Board)',
-        'pricing_invalid' => 'Please select a valid tour, date, and time to calculate pricing.',
+       'pricing_invalid' => 'The selected date, time, or price for the chosen number of people is unavailable. Please select another option.',
         'confirm_booking' => 'Pay :deposit to Confirm',
         'processing' => 'Processing...',
         'secured_by' => 'Secured by Kashier',

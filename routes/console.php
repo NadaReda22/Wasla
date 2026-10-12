@@ -12,8 +12,10 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+//Get hotels from OpenStreetMap and save them to the database every day at 3:00 AM
+Schedule::command('hotels:fetch-osm')->dailyAt('03:00');
+
 // Release bookings whose deposit was never paid.
-// Requires the scheduler: * * * * * php artisan schedule:run   (locally: php artisan schedule:work)
 Schedule::call(function () {
     Payment::where('status', 'pending')
         ->where('created_at', '<', now()->subMinutes(30))
@@ -32,6 +34,8 @@ Schedule::call(function () {
             });
         });
 })->name('expire-unpaid-payments')->everyFiveMinutes()->withoutOverlapping();
+
+
 
 // Automatically clean up passed departures every night at 2:00 AM
 Schedule::call(function () {

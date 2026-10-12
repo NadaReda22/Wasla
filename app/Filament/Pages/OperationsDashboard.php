@@ -45,7 +45,6 @@ class OperationsDashboard extends Page
 
         // Chart 1
         $last7Days = collect(range(6, 0))->map(fn($i) => Carbon::today()->subDays($i));
-        // Use translated format for days (e.g., Mon/الاثنين)
         $chartLabels = $last7Days->map(fn($d) => $d->translatedFormat('D'))->toArray(); 
         
         $bookingsPerDay = [];

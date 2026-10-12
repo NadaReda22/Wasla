@@ -19,7 +19,6 @@
             <p class="text-xl font-bold text-gray-800">{{ $booking->booking_reference }}</p>
         </div>
 
-        <!-- Optional: If you have a route to retry payment, link it here -->
         <a href="{{ route('booking.create') }}" class="block w-full bg-gray-800 text-white font-bold text-lg py-4 rounded-xl hover:bg-gray-900 transition shadow-md mb-4">
             Try Booking Again
         </a>

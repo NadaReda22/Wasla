@@ -36,23 +36,25 @@
     <section class="section-padding bg-white">
         <div class="container-max">
             <div class="max-w-3xl mx-auto space-y-4">
-                @forelse($faqs as $faq)
-                    <details class="card p-5 group cursor-pointer">
-                        <summary class="font-semibold text-navy flex items-center justify-between list-none marker:hidden">
-                            {{ $faq->{'question_' . app()->getLocale()} ?? $faq->question_en }}
-                            <svg class="w-5 h-5 text-primary transition-transform group-open:rotate-180 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </summary>
-                        <div class="text-navy/60 mt-3 leading-relaxed prose prose-sm max-w-none">
-                            {!! $faq->{'answer_' . app()->getLocale()} ?? $faq->answer_en !!}
-                        </div>
-                    </details>
-                @empty
-                    <div class="text-center text-navy/50 py-8">
-                        {{ __('faq.empty') }}
-                    </div>
-                @endforelse
+               @forelse($faqs as $faq)
+    <details class="card p-5 group cursor-pointer overflow-hidden">
+        <summary class="font-semibold text-navy flex items-center justify-between gap-4 list-none marker:hidden">
+            <span class="break-words w-full">
+                {{ $faq->{'question_' . app()->getLocale()} ?? $faq->question_en }}
+            </span>
+            <svg class="w-5 h-5 text-primary transition-transform group-open:rotate-180 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </summary>
+        <div class="text-navy/60 mt-3 leading-relaxed prose prose-sm max-w-none break-words overflow-hidden">
+            {!! $faq->{'answer_' . app()->getLocale()} ?? $faq->answer_en !!}
+        </div>
+    </details>
+@empty
+    <div class="text-center text-navy/50 py-8">
+        {{ __('faq.empty') }}
+    </div>
+@endforelse
             </div>
 
             <div class="text-center mt-12">

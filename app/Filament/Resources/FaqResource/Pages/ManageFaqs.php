@@ -40,7 +40,6 @@ class ManageFaqs extends Page
         ];
     }
 
-    // Card buttons call these by name: mountAction('edit' | 'delete' | 'toggleActive', { faq: id })
 
     public function editAction(): Actions\EditAction
     {

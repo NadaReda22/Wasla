@@ -14,7 +14,7 @@
             ];
 
             $mapPaletteAssignments = [];
-            foreach($selectedBookings as $index => $bookingId) {
+            foreach ($selectedBookings as $index => $bookingId) {
                 $mapPaletteAssignments[$bookingId] = $palette[$index % count($palette)]['hex'];
             }
         @endphp
@@ -43,7 +43,7 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{{ __('admin.columns.date') ?? 'Date' }}</label>
                                 <select wire:model.live="selectedDate" class="w-full rounded-lg border-gray-300 text-xs focus:ring-primary-500 focus:border-primary-500">
-                                    @foreach($this->availableDates as $val => $label)
+                                    @foreach ($this->availableDates as $val => $label)
                                         <option value="{{ $val }}">{{ $label }}</option>
                                     @endforeach
                                 </select>
@@ -52,7 +52,7 @@
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{{ __('admin.models.tour') ?? 'Tour' }}</label>
                                 <select wire:model.live="selectedTour" class="w-full rounded-lg border-gray-300 text-xs focus:ring-primary-500 focus:border-primary-500">
                                     <option value="">{{ __('admin.options.all_tours') ?? 'All Tours' }}</option>
-                                    @foreach($this->availableTours as $id => $name)
+                                    @foreach ($this->availableTours as $id => $name)
                                         <option value="{{ $id }}">{{ $name }}</option>
                                     @endforeach
                                 </select>
@@ -61,7 +61,7 @@
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{{ __('admin.distribution.dep_time') ?? 'Dep. Time' }}</label>
                                 <select wire:model.live="selectedDepartureTime" class="w-full rounded-lg border-gray-300 text-xs focus:ring-primary-500 focus:border-primary-500">
                                     <option value="">{{ __('admin.options.all_times') ?? 'All Times' }}</option>
-                                    @foreach($this->availableDepartureTimes as $timeVal => $timeLabel)
+                                    @foreach ($this->availableDepartureTimes as $timeVal => $timeLabel)
                                         <option value="{{ $timeLabel }}">{{ $timeLabel }}</option>
                                     @endforeach
                                 </select>
@@ -70,7 +70,7 @@
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{{ __('admin.distribution.ret_time') ?? 'Ret. Time' }}</label>
                                 <select wire:model.live="selectedReturnTime" class="w-full rounded-lg border-gray-300 text-xs focus:ring-primary-500 focus:border-primary-500">
                                     <option value="">{{ __('admin.options.all_times') ?? 'All Times' }}</option>
-                                    @foreach($this->availableReturnTimes as $timeVal => $timeLabel)
+                                    @foreach ($this->availableReturnTimes as $timeVal => $timeLabel)
                                         <option value="{{ $timeLabel }}">{{ $timeLabel }}</option>
                                     @endforeach
                                 </select>
@@ -79,7 +79,7 @@
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{{ __('admin.distribution.area_zone') ?? 'Area / Zone' }}</label>
                                 <select wire:model.live="selectedAreaId" class="w-full rounded-lg border-gray-300 text-xs focus:ring-primary-500 focus:border-primary-500">
                                     <option value="">{{ __('admin.options.all_zones') ?? 'All Zones' }}</option>
-                                    @foreach($this->availableAreas as $aId => $aName)
+                                    @foreach ($this->availableAreas as $aId => $aName)
                                         <option value="{{ $aId }}">{{ $aName }}</option>
                                     @endforeach
                                 </select>
@@ -130,7 +130,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
-                                    @forelse($this->unassignedBookings as $booking)
+                                    @forelse ($this->unassignedBookings as $booking)
                                         @php
                                             $selectedIndex = array_search($booking->id, $selectedBookings);
                                             $isSelected = $selectedIndex !== false;
@@ -140,7 +140,7 @@
                                             $retTimeRaw = $booking->departure?->return_time;
                                             
                                             $outTime = $depTimeRaw ? \Carbon\Carbon::parse($depTimeRaw)->format('g:i A') : '09:00 AM';
-                                            $retTime = $retTimeRaw ? \Carbon\Carbon::parse($retTimeRaw)->format('g:i A') : 'TBD';
+                                            $retTime = $retTimeRaw ? \Carbon\Carbon::parse($retTimeRaw)->format('g:i A') : __('admin.fleet.tbd');
                                         @endphp
                                         
                                         <tr class="hover:bg-gray-50 transition-colors {{ $isSelected ? $theme['bg'] : '' }}">
@@ -171,7 +171,7 @@
                                             <td class="px-4 py-3">
                                                 <div class="cursor-pointer group block" 
                                                      @click="focusMapPin({{ $booking->pickup_lat ?? 'null' }}, {{ $booking->pickup_lng ?? 'null' }})"
-                                                     title="Click to zoom on map">
+                                                     title="{{ __('admin.distribution.click_to_zoom') ?? 'Click to zoom on map' }}">
                                                     
                                                     <div class="font-bold flex items-start gap-1.5 transition-colors"
                                                          style="{{ $isSelected ? 'color: ' . $theme['hex'] . ';' : 'color: #374151;' }}">
@@ -181,7 +181,7 @@
                                                     
                                                     @if($booking->area)
                                                         <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-sm ms-6">
-                                                            <x-heroicon-s-map class="w-3 h-3" /> {{ app()->getLocale() === 'ar' ? ($booking->area->name_ar ?? $booking->area->name_en) : $booking->area->name_en }}
+                                                            <x-heroicon-s-map class="w-3 h-3" /> {{ app()->getLocale() === 'ar' ? ($booking->area->name_ar ?? $booking->area->name_en) :$booking->area->name_en }}
                                                         </span>
                                                     @endif
 
@@ -195,7 +195,7 @@
                                             </td>
                                             <td class="px-4 py-3">
                                                 <div class="font-black text-gray-800 text-[11px] mb-1.5 leading-tight" style="{{ $isSelected ? 'color: ' . $theme['hex'] . ';' : '' }}">
-                                                    {{ app()->getLocale() === 'ar' ? ($booking->tour->name_ar ?? $booking->tour->name_en ?? 'Custom Tour') : ($booking->tour->name_en ?? 'Custom Tour') }}
+                                                    {{ app()->getLocale() === 'ar' ? ($booking->tour->name_ar ?? $booking->tour->name_en ?? __('admin.options.custom_tour') ?? 'Custom Tour') : ($booking->tour->name_en ?? __('admin.options.custom_tour') ?? 'Custom Tour') }}
                                                 </div>
                                                 <div class="flex flex-col gap-1 text-[10px] font-bold text-gray-700">
                                                     <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100 w-max shadow-sm">
@@ -261,9 +261,9 @@
                     </div>
                         
                         <div class="p-4 space-y-4 max-h-[550px] overflow-y-auto">
-                            @forelse($this->activeVehicles as $vehicle)
+                            @forelse ($this->activeVehicles as $vehicle)
                                 @php
-                                    $percentage = $vehicle->capacity > 0 ? ($vehicle->seats_taken / $vehicle->capacity) * 100 : 0;
+                                    $percentage =$vehicle->capacity > 0 ? ($vehicle->seats_taken / $vehicle->capacity) * 100 : 0;
                                     $barColor = $percentage >= 100 ? 'bg-red-500' : ($percentage >= 80 ? 'bg-amber-400' : 'bg-emerald-500');
                                 @endphp
                                 
@@ -283,8 +283,8 @@
                                                 </span>
                                             </div>
                                             <div class="text-sm font-semibold text-gray-600 mt-2 flex flex-wrap items-center gap-4">
-                                                <span class="flex items-center gap-1.5"><x-heroicon-s-user-circle class="w-5 h-5 text-gray-400"/> {{ $vehicle->driver_name ?? __('admin.options.no_driver') }}</span>
-                                                <span class="flex items-center gap-1.5"><x-heroicon-s-phone class="w-4 h-4 text-green-500"/> {{ $vehicle->driver_phone ?? __('admin.options.no_phone') }}</span>
+                                                <span class="flex items-center gap-1.5"><x-heroicon-s-user-circle class="w-5 h-5 text-gray-400"/> {{ $vehicle->driver_name ?? __('admin.options.no_driver') ?? 'No Driver' }}</span>
+                                                <span class="flex items-center gap-1.5"><x-heroicon-s-phone class="w-4 h-4 text-green-500"/> {{ $vehicle->driver_phone ?? __('admin.options.no_phone') ?? 'No Phone' }}</span>
                                             </div>
                                         </div>
 
@@ -295,11 +295,14 @@
                                                 {{ __('admin.actions.assign') ?? 'Assign' }} ({{ $direction === 'outbound' ? (__('admin.distribution.outbound_short') ?? 'Outbound') : (__('admin.distribution.return_short') ?? 'Return') }})
                                             </button>
 
+                                            {{-- Each direction is locked on its own:
+                                                 pending_ensure_count = directions of this vehicle still waiting for "Ensure",
+                                                 locked_count         = directions of this vehicle that are already locked. --}}
                                             @if($vehicle->pending_ensure_count > 0)
-                                                {{ ($this->ensureVehicleAction)(['vehicleId' => $vehicle->id, 'plate' => $vehicle->plate_number]) }}
-                                            @elseif(count($vehicle->assignments_list) > 0)
+                                                {{ ($this->ensureVehicleAction)(['vehicleId' => $vehicle->id, 'plate' =>$vehicle->plate_number]) }}
+                                            @elseif($vehicle->locked_count > 0)
                                                 <span class="inline-flex items-center gap-1.5 text-[11px] font-black text-gray-400 bg-gray-100 border border-gray-200 rounded-lg py-2 px-4 cursor-not-allowed whitespace-nowrap" 
-                                                      title="All bookings for this vehicle are already locked & notified">
+                                                      title="{{ __('admin.fleet.all_locked_notified') ?? 'All bookings for this vehicle are already locked & notified' }}">
                                                     <x-heroicon-s-lock-closed class="w-3.5 h-3.5" />
                                                     {{ __('admin.distribution.all_locked') ?? 'All Locked' }}
                                                 </span>
@@ -321,7 +324,7 @@
                                                     </div>
                                                     <div class="flex items-center gap-1.5">
                                                         <x-heroicon-s-clock class="w-4 h-4 opacity-75" /> 
-                                                        <span dir="ltr">{{ $vehicle->staying_time_range['out'] }} &nbsp;➔&nbsp; {{ $vehicle->staying_time_range['ret'] }}</span>
+                                                        <span dir="ltr">{{ $vehicle->staying_time_range['out'] }} &nbsp;➔&nbsp; {{$vehicle->staying_time_range['ret'] }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -333,7 +336,7 @@
                                             <span>{{ __('admin.distribution.current_assignments') ?? 'Current Assignments Today' }} ({{ count($vehicle->assignments_list) }})</span>
                                         </div>
 
-                                        @forelse($vehicle->assignments_list as $assignment)
+                                        @forelse ($vehicle->assignments_list as $assignment)
                                             <div class="bg-white p-2.5 rounded-lg border border-gray-200 text-sm flex flex-col gap-1.5 shadow-sm">
                                                 <div class="flex items-center justify-between">
                                                     <span class="font-black text-gray-800 flex items-center gap-2">
@@ -347,21 +350,35 @@
                                                         {{ $assignment['tour_name'] }}
                                                     </span>
 
-                                                    <button wire:click="unassignBooking({{ json_encode($assignment['booking_ids']) }}, '{{ $assignment['direction'] }}')"
-                                                            class="text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 border border-red-200 shadow-sm"
-                                                            title="{{ __('admin.distribution.unassign_leg') ?? 'Unassign this leg' }}">
-                                                        <x-heroicon-s-x-mark class="w-3.5 h-3.5" /> {{ __('admin.actions.remove') ?? 'Remove' }}
-                                                    </button>
+                                                    {{-- A locked direction cannot be removed; only unlocked bookings can. --}}
+                                                    @if($assignment['is_locked'])
+                                                        <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md border border-gray-200 flex items-center gap-1"
+                                                              title="{{ __('admin.fleet.leg_locked_hint') }}">
+                                                            <x-heroicon-s-lock-closed class="w-3.5 h-3.5" /> {{ __('admin.distribution.locked') }}
+                                                        </span>
+                                                    @else
+                                                        <button wire:click="unassignBooking({{ json_encode($assignment['booking_ids']) }}, '{{$assignment['direction'] }}')"
+                                                                class="text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 border border-red-200 shadow-sm"
+                                                                title="{{ __('admin.distribution.unassign_leg') ?? 'Unassign this leg' }}">
+                                                            <x-heroicon-s-x-mark class="w-3.5 h-3.5" /> {{ __('admin.actions.remove') ?? 'Remove' }}
+                                                        </button>
+                                                    @endif
                                                 </div>
 
                                                 <div class="flex items-center gap-4 text-xs text-gray-700 mt-1">
                                                     <span class="flex items-center gap-1.5 font-bold"><x-heroicon-s-clock class="w-4 h-4 text-amber-500" /> <span dir="ltr">{{ $assignment['time'] }}</span></span>
                                                     <span class="flex items-center gap-1.5 font-bold"><x-heroicon-s-users class="w-4 h-4 text-indigo-500" /> {{ $assignment['pax'] }} {{ __('admin.distribution.seats') ?? 'Seats' }}</span>
+
+                                                    @if($assignment['locked_count'] > 0 && !$assignment['is_locked'])
+                                                        <span class="flex items-center gap-1.5 font-bold text-gray-500" title="{{ __('admin.fleet.leg_locked_hint') }}">
+                                                            <x-heroicon-s-lock-closed class="w-3.5 h-3.5" /> {{ $assignment['locked_count'] }} {{ __('admin.distribution.locked') }}
+                                                        </span>
+                                                    @endif
                                                 </div>
 
                                                 @if(!empty($assignment['zones']))
                                                     <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
-                                                        @foreach($assignment['zones'] as $zone)
+                                                        @foreach ($assignment['zones'] as $zone)
                                                             <span class="px-2 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm flex items-center gap-1">
                                                                 <x-heroicon-s-map class="w-3 h-3" /> {{ $zone }}
                                                             </span>
@@ -380,7 +397,7 @@
                                         <div class="flex justify-between text-xs font-black mb-1.5">
                                             <span class="text-gray-500 uppercase tracking-widest text-[10px]">{{ __('admin.distribution.slot_capacity') ?? 'Slot Capacity' }}</span>
                                             <span class="{{ $percentage >= 100 ? 'text-red-600' : 'text-gray-800' }}" dir="ltr">
-                                                {{ $vehicle->seats_taken }} / {{ $vehicle->capacity }} {{ __('admin.distribution.seats') ?? 'Seats' }}
+                                                {{ $vehicle->seats_taken }} / {{$vehicle->capacity }} {{ __('admin.distribution.seats') ?? 'Seats' }}
                                             </span>
                                         </div>
                                         <div class="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden border border-gray-200 shadow-inner">
@@ -503,7 +520,7 @@
 
                     const marker = L.marker([lat, lng], {
                         icon: icon,
-                        title: booking.pickup_name + ' (' + booking.seats_count + ' Seats)',
+                        title: booking.pickup_name + ' (' + booking.seats_count + ' {{ __('admin.distribution.seats') ?? "Seats" }})',
                         zIndexOffset: 1000
                     }).addTo(this.map);
 
@@ -531,9 +548,6 @@
                 this.layoutMarkers();
             },
 
-            // Spreads pins that would overlap on screen into a circle around their shared spot.
-            // Works in screen pixels, so it adapts to the zoom level and handles identical
-            // coordinates as well as pins that are only a few metres apart.
             layoutMarkers() {
                 if (!this.map) return;
 
@@ -543,9 +557,9 @@
                 const items = this.items;
                 if (!items.length) return;
 
-                const GROUP_DISTANCE = 30; // pins closer than this (px) are treated as the same place
-                const PIN_SPACING = 40;    // minimum distance (px) between neighbouring pins in a group
-                const MIN_RADIUS = 32;     // minimum circle radius (px)
+                const GROUP_DISTANCE = 30; 
+                const PIN_SPACING = 40;    
+                const MIN_RADIUS = 32;     
 
                 const points = items.map(it => this.map.project([it.lat, it.lng]));
                 const used = new Array(items.length).fill(false);
@@ -582,7 +596,6 @@
 
                         items[k].marker.setLatLng(target);
 
-                        // Thin line from the real location to the displaced pin
                         const line = L.polyline([centerLatLng, target], {
                             color: items[k].color,
                             weight: 2,
@@ -592,7 +605,6 @@
                         this.extras.push(line);
                     });
 
-                    // Dot marking the real shared location
                     const dot = L.circleMarker(centerLatLng, {
                         radius: 5,
                         color: '#ffffff',
