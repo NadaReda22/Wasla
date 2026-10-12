@@ -17,13 +17,12 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\Support\Facades\Storage;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $settings = Setting::first();
-        $brandLogo = $settings?->brand_logo ? \Illuminate\Support\Facades\Storage::url($settings->brand_logo) : asset('images/logo.png');
         
         return $panel
             ->default()
@@ -64,7 +63,10 @@ class AdminPanelProvider extends PanelProvider
             ->brandName(fn () => rescue(fn () => Setting::first()?->brand_name, 'Wasla'))
             ->brandLogo(fn () => view('filament.logo'))
             // Set your dynamic logo for the browser tab favicon
-            ->favicon($brandLogo)
+            ->favicon(fn () => rescue(function () {
+                $logo = Setting::first()?->brand_logo;
+                return $logo ? Storage::url($logo) : asset('images/logo.png');
+            }, asset('images/logo.png')))
             
             // Resources & pages discovery
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
