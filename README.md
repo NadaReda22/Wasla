@@ -14,12 +14,12 @@
 
 ## 📸 Screenshots
 
-| Front-End Experience | Admin Dashboard (CMS) |
+| Booking/Booking Distribution | Frontend & Manifests |
 | :---: | :---: |
-| <img src="documents/screenshots/w1.png" width="400"> <br> *Landing Page* | <img src="documents/screenshots/w5.png" width="400"> <br> *Stats & Operations Dashboard* |
-| <img src="documents/screenshots/w2.png" width="400"> <br> *Smart Booking Engine* | <img src="documents/screenshots/w6.png" width="400"> <br> *Smart Fleet Distribution (Map-Assisted)* |
-| <img src="documents/screenshots/w3.png" width="400"> <br> *Zones & Hotels Map* | <img src="documents/screenshots/w7.png" width="400"> <br> *Tours & Pricing Management* |
-| <img src="documents/screenshots/w4.png" width="400"> <br> *Checkout & Payment* | <img src="documents/screenshots/w8.png" width="400"> <br> *Driver WhatsApp Manifest* |
+| <img src="documents/screenshots/w1.png" width="400"> <br> *Booking Distribution* | <img src="documents/screenshots/w4.png" width="400"> <br> *Booking Form* |
+| <img src="documents/screenshots/w2.png" width="400"> <br> *Visual Map Distribution* | <img src="documents/screenshots/w6.png" width="400"> <br> *Driver WhatsApp Manifest* |
+| <img src="documents/screenshots/w3.png" width="400"> <br> *Zones & Hotels Map* | <img src="documents/screenshots/w7.png" width="400"> <br> *Daily Driver WhatsApp Manifest* |
+| <img src="documents/screenshots/w8.png" width="400"> <br> *Tours, Prcing, Departures Mangement* | <img src="documents/screenshots/w5.png" width="400"> <br> *Booking Form Instructions* |
 
 ## ✨ Key Features
 - **Smart Fleet Distribution:** Map-assisted interface for admins to assign vehicles to bookings based on location and capacity.
@@ -32,39 +32,31 @@
 ## 🚀 Installation & Setup
 
 1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/your-username/wasla.git](https://github.com/your-username/wasla.git)
-   cd wasla
+  ```bash
+# 1. Clone the repository
+git clone [https://github.com/NadaReda22/Wasla.git](https://github.com/NadaReda22/Wasla.git)
+cd wasla
 
-   Install dependencies:
-    Bash
+# 2. Install dependencies
+composer install
+npm install
 
-    composer install
-    npm install
+# 3. Environment Setup (Configure your database and API keys in .env)
+cp .env.example .env
+php artisan key:generate
+php artisan storage:link
 
-    Environment Setup:
-    Copy the .env.example file and configure your database and API keys:
-    Bash
+# 4. Database Migration & Seeding
+php artisan optimize:clear
+php artisan migrate --seed
 
-    cp .env.example .env
-    php artisan key:generate
-    php artisan storage:link
+# 5. (Optional) Fetch Hotels Data
+php artisan hotels:fetch-osm
 
-    Database Migration & Seeding:
-    Bash
-
-    php artisan optimize:clear
-    php artisan migrate --seed
-
-    (Optional) Fetch Hotels Data:
-    Bash
-
-    php artisan hotels:fetch-osm
-
-💻 Running Locally
-
-To run the application locally, you will need to start several processes in separate terminal tabs:
-Bash
+# ==========================================
+# 💻 Running Locally
+# Open separate terminal tabs for the following:
+# ==========================================
 
 # Tab 1: Start Laravel server
 php artisan serve
