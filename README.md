@@ -16,10 +16,10 @@
 
 | Front-End Experience | Admin Dashboard (CMS) |
 | :---: | :---: |
-| <img src="documents/screenshots/w1.png" width="400"> <br> *Landing Page* | <img src="docs/screenshots/w5.png" width="400"> <br> *Stats & Operations Dashboard* |
-| <img src="documents/screenshots/w2.png" width="400"> <br> *Smart Booking Engine* | <img src="docs/screenshots/w6.png" width="400"> <br> *Smart Fleet Distribution (Map-Assisted)* |
-| <img src="documents/screenshots/w3.png" width="400"> <br> *Zones & Hotels Map* | <img src="docs/screenshots/w7.png" width="400"> <br> *Tours & Pricing Management* |
-| <img src="documents/screenshots/w4.png" width="400"> <br> *Checkout & Payment* | <img src="docs/screenshots/w8.png" width="400"> <br> *Driver WhatsApp Manifest* |
+| <img src="documents/screenshots/w1.png" width="400"> <br> *Landing Page* | <img src="documents/screenshots/w5.png" width="400"> <br> *Stats & Operations Dashboard* |
+| <img src="documents/screenshots/w2.png" width="400"> <br> *Smart Booking Engine* | <img src="documents/screenshots/w6.png" width="400"> <br> *Smart Fleet Distribution (Map-Assisted)* |
+| <img src="documents/screenshots/w3.png" width="400"> <br> *Zones & Hotels Map* | <img src="documents/screenshots/w7.png" width="400"> <br> *Tours & Pricing Management* |
+| <img src="documents/screenshots/w4.png" width="400"> <br> *Checkout & Payment* | <img src="documents/screenshots/w8.png" width="400"> <br> *Driver WhatsApp Manifest* |
 
 ## ✨ Key Features
 - **Smart Fleet Distribution:** Map-assisted interface for admins to assign vehicles to bookings based on location and capacity.
