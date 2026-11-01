@@ -3,7 +3,7 @@
 **Wasla** is a comprehensive, enterprise-level Tourist Booking Platform and Fleet Management System. It provides a seamless front-end booking experience for tourists and a powerful, smart Admin Dashboard (CMS) for operations and fleet management.
 
 ## 🛠️ Tech Stack & Technologies
-- **Backend:** Laravel 11, PHP
+- **Backend:** Laravel 12, PHP
 - **Admin Panel:** Filament PHP (TALL Stack)
 - **Frontend:** Alpine.js, Tailwind CSS, Livewire
 - **Database:** MySQL
